@@ -97,9 +97,11 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
   useRopeJoint(fixed as never, j1 as never, [[0, 0, 0], [0, 0, 0], 1]);
   useRopeJoint(j1 as never, j2 as never, [[0, 0, 0], [0, 0, 0], 1]);
   useRopeJoint(j2 as never, j3 as never, [[0, 0, 0], [0, 0, 0], 1]);
+  // Must sit in the clip’s D-ring (card group is scale 2.7, pos y -1.2).
+  // At scale 2.25 this was ~1.45; at 2.7 the eyelet center is ~2.02.
   useSphericalJoint(j3 as never, card as never, [
     [0, 0, 0],
-    [0, 1.45, 0],
+    [0, 2.02, -0.05],
   ]);
 
   useLayoutEffect(() => {
