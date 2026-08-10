@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# accidental clone (not part of this portfolio)
+/sp-dev-fx-webparts/

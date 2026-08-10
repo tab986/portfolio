@@ -1,69 +1,46 @@
-import Image from "next/image";
+import AuroraClient from "@/components/AuroraClient";
+import HeroHeader from "@/components/HeroHeader";
+import PageTeleportScroll from "@/components/PageTeleportScroll";
+import ProjectCard from "@/components/ProjectCard";
+import WelcomeIntro from "@/components/WelcomeIntro";
+import LanyardCardClient from "@/components/band/LanyardCardClient";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="relative bg-obsidian">
+      <AuroraClient />
+      <PageTeleportScroll />
+
+      <WelcomeIntro />
+
+      <section
+        id="portfolio"
+        className="relative z-10 mx-auto flex min-h-svh w-full max-w-[90rem] flex-col px-5 py-8 sm:px-8 lg:px-8 lg:py-10 xl:px-12"
+      >
+        <div className="grid flex-1 grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-8 lg:min-h-[calc(100svh-5rem)] xl:gap-10">
+          <div className="flex flex-col justify-center gap-10 lg:col-span-5 lg:pr-4 xl:col-span-4">
+            <HeroHeader />
+            <div className="hidden max-w-md lg:block">
+              <ProjectCard />
+            </div>
+          </div>
+
+          <div className="flex w-full flex-col items-center justify-center lg:col-span-7 lg:items-end xl:col-span-8">
+            <div className="w-full max-w-[760px] lg:-mr-2 xl:-mr-6">
+              <LanyardCardClient />
+            </div>
+          </div>
+
+          <div className="lg:hidden">
+            <ProjectCard />
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+        <footer className="relative z-10 mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--surface-border)] pt-5 font-sans text-[10px] font-medium uppercase tracking-[0.16em] text-chrome-dim">
+          <span>Abdalrhmn Anwar · Baghdad</span>
+          <span className="text-chrome">React · Node.js · PostgreSQL</span>
+        </footer>
+      </section>
+    </main>
   );
 }
