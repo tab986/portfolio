@@ -35,13 +35,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={cn(
         "h-full antialiased",
         plusJakarta.variable,
         jetbrainsMono.variable,
       )}
     >
-      <body className="grain min-h-full flex flex-col font-sans">
+      <body className="grain min-h-full flex flex-col font-sans" suppressHydrationWarning>
         {children}
       </body>
     </html>

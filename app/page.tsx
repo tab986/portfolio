@@ -38,7 +38,18 @@ export default function Home() {
 
         <footer className="relative z-10 mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--surface-border)] pt-5 font-sans text-[10px] font-medium uppercase tracking-[0.16em] text-chrome-dim">
           <span>Abdalrhmn Anwar · Baghdad</span>
-          <span className="text-chrome">React · Node.js · PostgreSQL</span>
+          <div className="flex flex-wrap items-center gap-4">
+            <a
+              href="/cv/abdalrhmn-anwar-cv.pdf"
+              download="Abdalrhmn-Anwar-CV.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="cursor-pointer text-chrome transition-colors duration-300 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+            >
+              CV / Resume
+            </a>
+            <span className="text-chrome">React · Node.js · PostgreSQL</span>
+          </div>
         </footer>
       </section>
     </main>

@@ -1,4 +1,5 @@
 import type { ThreeElements } from "@react-three/fiber";
+import type { BufferGeometry } from "three";
 
 declare module "@react-three/fiber" {
   interface ThreeElements {
@@ -16,7 +17,7 @@ declare module "@react-three/fiber" {
 }
 
 declare module "meshline" {
-  export class MeshLineGeometry {
+  export class MeshLineGeometry extends BufferGeometry {
     setPoints(points: unknown): void;
   }
   export class MeshLineMaterial {

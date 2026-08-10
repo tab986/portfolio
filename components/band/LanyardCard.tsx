@@ -331,9 +331,6 @@ export default function LanyardCard() {
           </Canvas>
         </WebGLErrorBoundary>
       </div>
-      <p className="pointer-events-none mt-1 text-center font-mono text-[10px] uppercase tracking-[0.22em] text-chrome-dim">
-        Drag the card
-      </p>
     </div>
   );
 }
