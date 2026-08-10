@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 import SplitText from "@/components/SplitText";
 import HeroExperienceClient from "@/components/hero-3d/HeroExperienceClient";
 
-function teleportToPortfolio(e: MouseEvent<HTMLAnchorElement>) {
+function teleportToTerminal(e: MouseEvent<HTMLAnchorElement>) {
   e.preventDefault();
-  document
-    .getElementById("portfolio")
-    ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const el = document.getElementById("terminal");
+  if (!el) return;
+  window.scrollTo({ top: el.offsetTop, behavior: "smooth" });
 }
 
 export default function WelcomeIntro() {
@@ -54,7 +54,7 @@ export default function WelcomeIntro() {
               onLetterAnimationComplete={() => {}}
             />
             <p className="mt-6 max-w-sm font-sans text-sm leading-relaxed text-chrome md:text-base">
-              Scroll to explore selected work, stack, and contact.
+              Scroll into the CLI, then the ID card, stack, and contact.
             </p>
           </div>
         </div>
@@ -75,8 +75,8 @@ export default function WelcomeIntro() {
       </div>
 
       <a
-        href="#portfolio"
-        onClick={teleportToPortfolio}
+        href="#terminal"
+        onClick={teleportToTerminal}
         className="absolute bottom-10 left-1/2 z-30 flex -translate-x-1/2 cursor-pointer flex-col items-center gap-2 text-chrome transition-colors duration-300 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
       >
         <span className="font-sans text-[10px] font-medium uppercase tracking-[0.28em]">

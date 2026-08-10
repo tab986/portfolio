@@ -1,6 +1,7 @@
 import AuroraClient from "@/components/AuroraClient";
 import HeroHeader from "@/components/HeroHeader";
 import PageTeleportScroll from "@/components/PageTeleportScroll";
+import PortfolioTerminal from "@/components/PortfolioTerminal";
 import ProjectCard from "@/components/ProjectCard";
 import WelcomeIntro from "@/components/WelcomeIntro";
 import LanyardCardClient from "@/components/band/LanyardCardClient";
@@ -12,6 +13,8 @@ export default function Home() {
       <PageTeleportScroll />
 
       <WelcomeIntro />
+
+      <PortfolioTerminal />
 
       <section
         id="portfolio"
