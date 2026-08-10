@@ -37,7 +37,11 @@ export default function HeroHeader() {
           className="glass-panel group inline-flex cursor-pointer items-center gap-2.5 rounded-none border border-gold/35 px-5 py-3 font-sans text-sm font-semibold text-warm-white transition-[border-color,box-shadow,transform,color] duration-300 hover:-translate-y-0.5 hover:border-gold hover:text-gold hover:shadow-[0_0_28px_rgba(212,175,55,0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
         >
           <span className="grid h-7 w-7 place-items-center border border-gold/40 bg-[var(--gold-soft)] text-gold transition-colors duration-300 group-hover:border-gold group-hover:bg-gold group-hover:text-obsidian">
-            <FileDown className="h-3.5 w-3.5" aria-hidden />
+            <FileDown
+              className="h-3.5 w-3.5"
+              aria-hidden
+              suppressHydrationWarning
+            />
           </span>
           <span className="flex flex-col items-start leading-tight">
             <span>Download CV</span>

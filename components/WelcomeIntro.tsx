@@ -36,7 +36,13 @@ export default function WelcomeIntro() {
       aria-label="Welcome"
       className="relative z-10 h-svh min-h-[100dvh] w-full overflow-hidden"
     >
-      <div className="mx-auto grid h-full w-full max-w-[90rem] grid-cols-1 items-stretch px-5 sm:px-8 lg:grid-cols-12 lg:gap-6 lg:px-8 xl:gap-8 xl:px-12">
+      {/* Match other pages’ charcoal atmosphere while Aurora boots */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_85%_65%_at_72%_42%,rgba(54,54,54,0.55),transparent_68%),radial-gradient(ellipse_55%_45%_at_18%_78%,rgba(212,175,55,0.05),transparent_62%),#1a1a1a]"
+      />
+
+      <div className="relative mx-auto grid h-full w-full max-w-[90rem] grid-cols-1 items-stretch px-5 sm:px-8 lg:grid-cols-12 lg:gap-6 lg:px-8 xl:gap-8 xl:px-12">
         <div className="relative z-20 flex flex-col justify-center pt-16 lg:col-span-4 lg:pt-0 xl:col-span-4">
           <div className="max-w-md lg:max-w-none">
             <SplitText

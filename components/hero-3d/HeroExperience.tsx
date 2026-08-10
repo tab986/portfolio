@@ -16,11 +16,15 @@ export default function HeroExperience() {
 
   return (
     <Canvas
-      className="h-full w-full touch-none"
+      className="h-full w-full touch-none bg-transparent"
+      style={{ background: "transparent" }}
       frameloop="always"
       dpr={[1, 1.5]}
       performance={{ min: 0.5 }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+      onCreated={({ gl }) => {
+        gl.setClearColor(0x000000, 0);
+      }}
       camera={{
         position: isMobile ? [0, 2, 18] : [0, 2, 15],
         fov: 43,

@@ -25,6 +25,11 @@ export const metadata: Metadata = {
       "Full Stack Developer based in Baghdad. React · Node.js · PostgreSQL.",
     type: "website",
   },
+  // Site is already dark — stop Dark Reader from rewriting markup pre-hydrate
+  other: {
+    "darkreader-lock": "1",
+    "color-scheme": "dark",
+  },
 };
 
 export default function RootLayout({
@@ -42,7 +47,10 @@ export default function RootLayout({
         jetbrainsMono.variable,
       )}
     >
-      <body className="grain min-h-full flex flex-col font-sans" suppressHydrationWarning>
+      <body
+        className="grain flex min-h-full flex-col font-sans"
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>

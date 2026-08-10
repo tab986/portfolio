@@ -115,6 +115,7 @@
 html {
   scroll-behavior: smooth;
   height: 100%;
+  color-scheme: dark;
 }
 
 body {
