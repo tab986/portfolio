@@ -34,20 +34,19 @@ export default function WelcomeIntro() {
     <section
       id="welcome"
       aria-label="Welcome"
-      className="relative z-10 h-svh min-h-[100dvh] w-full overflow-hidden"
+      className="relative z-10 flex h-svh min-h-[100dvh] w-full max-w-[100vw] flex-col overflow-hidden"
     >
-      {/* Match other pages’ charcoal atmosphere while Aurora boots */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_85%_65%_at_72%_42%,rgba(54,54,54,0.55),transparent_68%),radial-gradient(ellipse_55%_45%_at_18%_78%,rgba(212,175,55,0.05),transparent_62%),#1a1a1a]"
       />
 
-      <div className="relative mx-auto grid h-full w-full max-w-[90rem] grid-cols-1 items-stretch px-5 sm:px-8 lg:grid-cols-12 lg:gap-6 lg:px-8 xl:gap-8 xl:px-12">
-        <div className="relative z-20 flex flex-col justify-center pt-16 lg:col-span-4 lg:pt-0 xl:col-span-4">
+      <div className="relative mx-auto grid h-full w-full max-w-[90rem] flex-1 grid-cols-1 content-start items-stretch gap-2 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:gap-4 sm:px-8 lg:grid-cols-12 lg:content-stretch lg:gap-6 lg:px-8 lg:pb-8 lg:pt-0 xl:gap-8 xl:px-12">
+        <div className="relative z-20 flex shrink-0 flex-col justify-center pt-2 lg:col-span-4 lg:pt-0 xl:col-span-4">
           <div className="max-w-md lg:max-w-none">
             <SplitText
               text="welcome to Abdalrhman portfolio"
-              className="font-sans text-[clamp(2rem,5.5vw,4.75rem)] font-semibold leading-[1.05] tracking-tight text-warm-white"
+              className="font-sans text-[clamp(1.65rem,8.2vw,4.75rem)] font-semibold leading-[1.08] tracking-tight text-warm-white sm:text-[clamp(2rem,5.5vw,4.75rem)] sm:leading-[1.05]"
               delay={80}
               duration={0.7}
               ease="power3.out"
@@ -59,7 +58,7 @@ export default function WelcomeIntro() {
               textAlign="left"
               onLetterAnimationComplete={() => {}}
             />
-            <p className="mt-6 max-w-sm font-sans text-sm leading-relaxed text-chrome md:text-base">
+            <p className="mt-3 max-w-sm font-sans text-[0.9375rem] leading-relaxed text-chrome sm:mt-6 sm:text-sm md:text-base">
               Scroll into the CLI, then the ID card, stack, and contact.
             </p>
           </div>
@@ -67,10 +66,9 @@ export default function WelcomeIntro() {
 
         <figure
           aria-hidden={!sceneActive}
-          className="relative min-h-[48vh] flex-1 cursor-grab active:cursor-grabbing lg:col-span-8 lg:min-h-0 xl:col-span-8"
-          style={{ touchAction: "none" }}
+          className="relative min-h-[38vh] w-full min-w-0 flex-1 cursor-grab active:cursor-grabbing sm:min-h-[44vh] lg:col-span-8 lg:min-h-0 xl:col-span-8"
         >
-          <div className="absolute inset-0 -mx-5 sm:-mx-8 lg:inset-y-0 lg:-right-8 lg:left-0 lg:mx-0 xl:-right-12">
+          <div className="absolute inset-0 overflow-hidden lg:inset-y-0 lg:-right-8 lg:left-0 xl:-right-12">
             {sceneActive ? (
               <HeroExperienceClient />
             ) : (
@@ -83,7 +81,7 @@ export default function WelcomeIntro() {
       <a
         href="#terminal"
         onClick={teleportToTerminal}
-        className="absolute bottom-10 left-1/2 z-30 flex -translate-x-1/2 cursor-pointer flex-col items-center gap-2 text-chrome transition-colors duration-300 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
+        className="tap-target absolute bottom-[max(1.25rem,env(safe-area-inset-bottom))] left-1/2 z-30 flex min-h-11 min-w-[4.5rem] -translate-x-1/2 cursor-pointer flex-col items-center justify-center gap-2 px-4 py-2 text-chrome transition-colors duration-300 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold"
       >
         <span className="font-sans text-[10px] font-medium uppercase tracking-[0.28em]">
           Scroll

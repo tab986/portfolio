@@ -41,13 +41,13 @@ function OutputLines({ lines }: { lines: TerminalLine[] }) {
         if (line.type === "link") {
           const isExternal = line.href.startsWith("http");
           return (
-            <div key={i} className="whitespace-pre-wrap break-words">
+            <div key={i} className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
               <span className="text-[#9ae6b4]">{line.prefix}</span>
               <a
                 href={line.href}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
-                className="text-gold underline-offset-2 transition-colors hover:text-warm-white hover:underline"
+                className="tap-target inline-flex min-h-11 items-center py-1 text-gold underline-offset-2 transition-colors hover:text-warm-white hover:underline"
               >
                 {line.label}
               </a>
@@ -57,7 +57,7 @@ function OutputLines({ lines }: { lines: TerminalLine[] }) {
         return (
           <div
             key={i}
-            className="whitespace-pre-wrap break-words text-[#9ae6b4]"
+            className="whitespace-pre-wrap break-words text-[#9ae6b4] [overflow-wrap:anywhere]"
           >
             {line.text}
           </div>
@@ -203,24 +203,28 @@ export default function PortfolioTerminal() {
       ref={sectionRef}
       id="terminal"
       aria-label="Portfolio terminal"
-      className="relative z-10 flex min-h-svh w-full items-center justify-center px-5 py-10 sm:px-8 lg:px-8 xl:px-12"
+      className="relative z-10 flex min-h-svh w-full max-w-[100vw] items-center justify-center overflow-x-hidden px-4 py-8 sm:px-8 sm:py-10 lg:px-8 xl:px-12"
+      style={{
+        paddingBottom: "max(2rem, env(safe-area-inset-bottom))",
+        paddingTop: "max(2rem, env(safe-area-inset-top))",
+      }}
     >
-      <div className="w-full max-w-4xl">
+      <div className="w-full min-w-0 max-w-4xl">
         <div className="overflow-hidden rounded-lg border border-[var(--surface-border)] bg-[#0d0d0d] shadow-[0_0_0_1px_rgba(212,175,55,0.08),0_24px_80px_rgba(0,0,0,0.55)]">
-          <div className="flex items-center gap-3 border-b border-[var(--surface-border)] bg-[#161616] px-4 py-2.5">
-            <div className="flex gap-1.5" aria-hidden>
+          <div className="flex items-center gap-2 border-b border-[var(--surface-border)] bg-[#161616] px-3 py-2 sm:gap-3 sm:px-4 sm:py-2.5">
+            <div className="flex shrink-0 gap-1.5" aria-hidden>
               <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f56]" />
               <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e]" />
               <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f]" />
             </div>
-            <p className="flex-1 truncate font-mono text-[11px] text-chrome-dim sm:text-xs">
+            <p className="min-w-0 flex-1 truncate font-mono text-[10px] text-chrome-dim sm:text-[11px] sm:text-xs">
               abdalrhmn@portfolio-cli:~ — bash
             </p>
             <button
               type="button"
               onClick={handleReplay}
               disabled={playing || !done}
-              className="font-mono text-[10px] uppercase tracking-[0.18em] text-chrome transition-colors hover:text-gold disabled:cursor-not-allowed disabled:opacity-40"
+              className="tap-target shrink-0 px-2 font-mono text-[10px] uppercase tracking-[0.18em] text-chrome transition-colors hover:text-gold disabled:cursor-not-allowed disabled:opacity-40 sm:px-3"
             >
               Replay
             </button>
@@ -229,7 +233,7 @@ export default function PortfolioTerminal() {
           <div
             ref={scrollerRef}
             data-terminal-scroll
-            className="max-h-[min(70svh,36rem)] overflow-y-auto px-4 py-4 font-mono text-[12px] leading-relaxed sm:px-5 sm:text-[13px]"
+            className="max-h-[min(62svh,32rem)] overflow-x-auto overflow-y-auto overscroll-contain px-3 py-3 font-mono text-[11px] leading-relaxed sm:max-h-[min(70svh,36rem)] sm:px-5 sm:py-4 sm:text-[13px]"
             role="log"
             aria-live="polite"
             aria-relevant="additions"
@@ -241,21 +245,21 @@ export default function PortfolioTerminal() {
             {history.map((entry, idx) => {
               if (entry.kind === "command") {
                 return (
-                  <div key={`cmd-${idx}`} className="mt-1">
+                  <div key={`cmd-${idx}`} className="mt-1 break-words">
                     <span className="text-gold">{PROMPT}</span>{" "}
                     <span className="text-warm-white">{entry.text}</span>
                   </div>
                 );
               }
               return (
-                <div key={`out-${idx}`} className="mt-0.5">
+                <div key={`out-${idx}`} className="mt-0.5 min-w-0">
                   <OutputLines lines={entry.lines} />
                 </div>
               );
             })}
 
             {showPrompt ? (
-              <div className="mt-1 flex flex-wrap items-baseline">
+              <div className="mt-1 flex flex-wrap items-baseline break-all">
                 <span className="text-gold">{PROMPT}</span>
                 <span className="ml-2 text-warm-white">{typedCommand}</span>
                 <span
@@ -267,7 +271,7 @@ export default function PortfolioTerminal() {
           </div>
         </div>
 
-        <p className="mt-4 text-center font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-chrome-dim">
+        <p className="mt-4 px-2 text-center font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-chrome-dim sm:tracking-[0.22em]">
           Scroll for ID card &amp; projects
         </p>
       </div>

@@ -16,10 +16,10 @@ export default function HeroExperience() {
 
   return (
     <Canvas
-      className="h-full w-full touch-none bg-transparent"
+      className={`h-full w-full bg-transparent ${isMobile ? "touch-pan-y" : "touch-none"}`}
       style={{ background: "transparent" }}
       frameloop="always"
-      dpr={[1, 1.5]}
+      dpr={[1, isMobile ? 1.25 : 1.5]}
       performance={{ min: 0.5 }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       onCreated={({ gl }) => {
@@ -33,7 +33,7 @@ export default function HeroExperience() {
       <OrbitControls
         enablePan={false}
         enableZoom={false}
-        enableRotate
+        enableRotate={!isMobile}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 2}
         maxDistance={20}

@@ -3,6 +3,7 @@
 import {
   Component,
   Suspense,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -23,6 +24,7 @@ import {
   type RapierRigidBody,
 } from "@react-three/rapier";
 import { MeshLineGeometry, MeshLineMaterial } from "meshline";
+import { useMediaQuery } from "@/components/hero-3d/useMediaQuery";
 
 extend({ MeshLineGeometry, MeshLineMaterial });
 
@@ -33,6 +35,7 @@ const CARD_TEXTURE_PATH = "/assets/card-texture.png?v=4";
 type BandProps = {
   maxSpeed?: number;
   minSpeed?: number;
+  isMobile?: boolean;
 };
 
 type RigidBodyWithLerped = RapierRigidBody & {
@@ -43,13 +46,18 @@ function isFiniteVec3(v: THREE.Vector3) {
   return Number.isFinite(v.x) && Number.isFinite(v.y) && Number.isFinite(v.z);
 }
 
-function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
+function Band({
+  maxSpeed = 50,
+  minSpeed = 10,
+  isMobile = false,
+}: BandProps) {
   const band = useRef<THREE.Mesh>(null);
   const fixed = useRef<RapierRigidBody>(null);
   const j1 = useRef<RapierRigidBody>(null);
   const j2 = useRef<RapierRigidBody>(null);
   const j3 = useRef<RapierRigidBody>(null);
   const card = useRef<RapierRigidBody>(null);
+  const { gl } = useThree();
 
   const vec = useMemo(() => new THREE.Vector3(), []);
   const ang = useMemo(() => new THREE.Vector3(), []);
@@ -57,15 +65,14 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
   const dir = useMemo(() => new THREE.Vector3(), []);
   const tmp = useMemo(() => new THREE.Vector3(), []);
 
-  // Stable MeshLine geometry instance (avoids broken/missing rope updates)
   const bandGeometry = useMemo(() => new MeshLineGeometry(), []);
 
   const segmentProps = {
     type: "dynamic" as const,
     canSleep: true,
     colliders: false as const,
-    angularDamping: 4,
-    linearDamping: 4,
+    angularDamping: isMobile ? 8 : 4,
+    linearDamping: isMobile ? 6 : 4,
   };
 
   const { nodes, materials } = useGLTF(GLTF_PATH) as unknown as {
@@ -94,11 +101,10 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
   const [dragged, drag] = useState<false | THREE.Vector3>(false);
   const [hovered, hover] = useState(false);
 
+  // Keep clip eyelet alignment stable; framing is handled by camera / hang origin.
   useRopeJoint(fixed as never, j1 as never, [[0, 0, 0], [0, 0, 0], 1]);
   useRopeJoint(j1 as never, j2 as never, [[0, 0, 0], [0, 0, 0], 1]);
   useRopeJoint(j2 as never, j3 as never, [[0, 0, 0], [0, 0, 0], 1]);
-  // Must sit in the clip’s D-ring (card group is scale 2.7, pos y -1.2).
-  // At scale 2.25 this was ~1.45; at 2.7 the eyelet center is ~2.02.
   useSphericalJoint(j3 as never, card as never, [
     [0, 0, 0],
     [0, 2.02, -0.05],
@@ -114,7 +120,6 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
     cardTexture.anisotropy = 8;
     cardTexture.needsUpdate = true;
 
-    // Seed rope so it doesn’t flash empty before the first physics tick
     bandGeometry.setPoints([
       new THREE.Vector3(3.5, 4, 0),
       new THREE.Vector3(3.0, 4, 0),
@@ -122,6 +127,10 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
       new THREE.Vector3(1.5, 4, 0),
     ]);
   }, [texture, cardTexture, bandGeometry]);
+
+  useEffect(() => {
+    gl.domElement.style.touchAction = dragged ? "none" : "pan-y";
+  }, [dragged, gl]);
 
   useEffect(() => {
     if (hovered) {
@@ -138,10 +147,22 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
       dir.copy(vec).sub(state.camera.position).normalize();
       vec.add(dir.multiplyScalar(state.camera.position.length()));
       [card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());
+
+      let nextX = vec.x - dragged.x;
+      let nextY = vec.y - dragged.y;
+      let nextZ = vec.z - dragged.z;
+
+      if (isMobile && fixed.current) {
+        const anchor = fixed.current.translation();
+        nextX = THREE.MathUtils.clamp(nextX, anchor.x - 1.6, anchor.x + 1.6);
+        nextY = THREE.MathUtils.clamp(nextY, anchor.y - 4.2, anchor.y - 0.4);
+        nextZ = THREE.MathUtils.clamp(nextZ, -0.8, 0.8);
+      }
+
       card.current.setNextKinematicTranslation({
-        x: vec.x - dragged.x,
-        y: vec.y - dragged.y,
-        z: vec.z - dragged.z,
+        x: nextX,
+        y: nextY,
+        z: nextZ,
       });
     }
 
@@ -155,7 +176,6 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
       return;
     }
 
-    // Smooth mid-joints so the rope curve doesn’t kink / detach
     ([j1, j2] as const).forEach((ref) => {
       const body = ref.current as RigidBodyWithLerped | null;
       if (!body) return;
@@ -176,7 +196,6 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
     const j2Body = j2.current as RigidBodyWithLerped;
     if (!j1Body.lerped || !j2Body.lerped) return;
 
-    // World positions → rope path (band mesh lives outside the hang group)
     const a = j3.current.translation();
     const d = fixed.current.translation();
     curve.points[0].set(a.x, a.y, a.z);
@@ -191,16 +210,28 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
     ang.copy(card.current.angvel());
     rot.copy(card.current.rotation());
     if (isFiniteVec3(ang) && isFiniteVec3(rot)) {
+      // Mobile: damp extreme swing/tilt so the card stays readable in-frame.
+      const settle = isMobile ? 0.55 : 0.25;
+      const damp = isMobile ? 0.82 : 1;
       card.current.setAngvel(
-        { x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z },
+        {
+          x: ang.x * damp,
+          y: ang.y - rot.y * settle,
+          z: ang.z * damp,
+        },
         true,
       );
     }
   });
 
+  // Mobile: centered hang slightly lower so content sits mid-frame in 80dvh stage.
+  // Desktop: original right-biased hang for the side camera.
+  const hangOrigin = isMobile ? ([0, 3.25, 0] as const) : ([1.5, 4, 0] as const);
+  const lineWidth = isMobile ? 0.45 : 1;
+
   return (
     <>
-      <group position={[1.5, 4, 0]}>
+      <group position={hangOrigin}>
         <RigidBody ref={fixed} {...segmentProps} type="fixed" />
         <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps}>
           <BallCollider args={[0.1]} />
@@ -228,12 +259,18 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
               drag(false);
             }}
             onPointerDown={(e) => {
+              e.stopPropagation();
               (e.target as Element).setPointerCapture(e.pointerId);
-              drag(
-                new THREE.Vector3()
-                  .copy(e.point)
-                  .sub(vec.copy(card.current!.translation())),
-              );
+              const offset = new THREE.Vector3()
+                .copy(e.point)
+                .sub(vec.copy(card.current!.translation()));
+              // Limit initial grab offset on mobile so the card can't sling off-screen.
+              if (isMobile) {
+                offset.x = THREE.MathUtils.clamp(offset.x, -0.65, 0.65);
+                offset.y = THREE.MathUtils.clamp(offset.y, -0.65, 0.65);
+                offset.z = THREE.MathUtils.clamp(offset.z, -0.35, 0.35);
+              }
+              drag(offset);
             }}
           >
             <mesh geometry={nodes.card.geometry}>
@@ -263,7 +300,7 @@ function Band({ maxSpeed = 50, minSpeed = 10 }: BandProps) {
           useMap
           map={texture}
           repeat={[-4, 1]}
-          lineWidth={1}
+          lineWidth={lineWidth}
         />
       </mesh>
     </>
@@ -286,9 +323,75 @@ class WebGLErrorBoundary extends Component<
   }
 }
 
+const DESKTOP_STAGE =
+  "relative h-[min(82vh,700px)] w-full lg:h-[min(78vh,660px)] lg:min-h-[560px]";
+
+/** Desktop camera — never mutated by the mobile controller. */
+const DESKTOP_CAMERA = {
+  position: [-2.4, 0, 11] as [number, number, number],
+  fov: 24,
+};
+
+/** Mobile: pulled back + lookAt mid-card so strap + badge fit inside stage. */
+const MOBILE_CAMERA = {
+  position: [0, 0.05, 14.75] as [number, number, number],
+  fov: 34,
+  lookAt: [0, -0.45, 0] as [number, number, number],
+};
+
+/**
+ * Applies mobile framing and keeps the projection matrix fresh on resize.
+ * On desktop only updates aspect (leaves position/fov to Canvas defaults).
+ */
+function ResponsiveCardCamera({ isMobile }: { isMobile: boolean }) {
+  const { camera, gl, size } = useThree();
+
+  const applyFraming = useCallback(() => {
+    const cam = camera as THREE.PerspectiveCamera;
+    if (!("fov" in cam)) return;
+
+    const w = Math.max(size.width, gl.domElement.clientWidth, 1);
+    const h = Math.max(size.height, gl.domElement.clientHeight, 1);
+    cam.aspect = w / h;
+
+    if (isMobile) {
+      cam.position.set(...MOBILE_CAMERA.position);
+      cam.fov = MOBILE_CAMERA.fov;
+      cam.near = 0.1;
+      cam.far = 100;
+      cam.lookAt(...MOBILE_CAMERA.lookAt);
+    }
+
+    cam.updateProjectionMatrix();
+  }, [camera, gl, isMobile, size.height, size.width]);
+
+  useLayoutEffect(() => {
+    applyFraming();
+
+    const onResize = () => applyFraming();
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+
+    const parent = gl.domElement.parentElement;
+    const ro = new ResizeObserver(onResize);
+    ro.observe(gl.domElement);
+    if (parent) ro.observe(parent);
+
+    return () => {
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
+      ro.disconnect();
+    };
+  }, [applyFraming, gl]);
+
+  return null;
+}
+
 function CardFallback() {
   return (
-    <div className="flex h-[min(82vh,700px)] w-full items-center justify-center lg:h-[min(78vh,660px)] lg:min-h-[560px]">
+    <div
+      className={`flex items-center justify-center overflow-hidden max-md:h-[min(80dvh,34rem)] max-md:min-h-[min(500px,80dvh)] max-md:max-w-[100vw] ${DESKTOP_STAGE}`}
+    >
       <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-chrome-dim">
         3D card unavailable
       </span>
@@ -297,12 +400,28 @@ function CardFallback() {
 }
 
 export default function LanyardCard() {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
   return (
-    <div className="lanyard-card relative flex w-full flex-col items-center bg-transparent">
-      <div className="relative h-[min(82vh,700px)] w-full lg:h-[min(78vh,660px)] lg:min-h-[560px]">
+    <div className="lanyard-card relative flex w-full max-w-[100vw] flex-col items-center overflow-hidden bg-transparent">
+      <div
+        className={`lanyard-card__stage ${DESKTOP_STAGE} max-md:h-[min(80dvh,34rem)] max-md:min-h-[min(500px,80dvh)] max-md:max-w-[100vw] max-md:overflow-hidden`}
+      >
         <WebGLErrorBoundary fallback={<CardFallback />}>
           <Canvas
-            camera={{ position: [-2.4, 0, 11], fov: 24 }}
+            key={isMobile ? "card-mobile" : "card-desktop"}
+            className="h-full w-full"
+            camera={
+              isMobile
+                ? {
+                    position: MOBILE_CAMERA.position,
+                    fov: MOBILE_CAMERA.fov,
+                  }
+                : {
+                    position: DESKTOP_CAMERA.position,
+                    fov: DESKTOP_CAMERA.fov,
+                  }
+            }
             gl={{
               alpha: true,
               antialias: true,
@@ -312,20 +431,31 @@ export default function LanyardCard() {
             }}
             onCreated={({ gl }) => {
               gl.setClearColor(0x000000, 0);
+              gl.domElement.style.width = "100%";
+              gl.domElement.style.height = "100%";
+              gl.domElement.style.touchAction = "pan-y";
               gl.domElement.addEventListener("webglcontextlost", (e) => {
                 e.preventDefault();
               });
             }}
-            style={{ background: "transparent" }}
-            dpr={[1, 1.5]}
+            style={{
+              width: "100%",
+              height: "100%",
+              background: "transparent",
+              touchAction: "pan-y",
+              display: "block",
+            }}
+            dpr={isMobile ? [1, 1.25] : [1, 1.5]}
+            resize={{ scroll: false, debounce: { scroll: 0, resize: 0 } }}
           >
+            <ResponsiveCardCamera isMobile={isMobile} />
             <ambientLight intensity={Math.PI * 0.7} />
             <directionalLight position={[5, 8, 5]} intensity={1.6} />
             <directionalLight position={[-6, 3, 2]} intensity={0.7} />
             <pointLight position={[0, 2, 6]} intensity={2.2} />
             <Suspense fallback={null}>
               <Physics interpolate gravity={[0, -40, 0]} timeStep={1 / 60}>
-                <Band />
+                <Band isMobile={isMobile} />
               </Physics>
             </Suspense>
           </Canvas>
