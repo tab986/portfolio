@@ -116,16 +116,16 @@ html {
   scroll-behavior: smooth;
   height: 100%;
   color-scheme: dark;
-  overflow-x: hidden;
+  overflow-x: clip;
+  overflow-y: auto;
 }
 
 body {
   background: var(--obsidian);
   color: var(--warm-white);
   font-family: var(--font-plus-jakarta), system-ui, sans-serif;
-  height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
+  min-height: 100%;
+  overflow: visible;
   overscroll-behavior-y: none;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;

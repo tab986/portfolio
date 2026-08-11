@@ -9,7 +9,8 @@ function teleportToTerminal(e: MouseEvent<HTMLAnchorElement>) {
   e.preventDefault();
   const el = document.getElementById("terminal");
   if (!el) return;
-  window.scrollTo({ top: el.offsetTop, behavior: "smooth" });
+  const root = document.scrollingElement || document.documentElement;
+  root.scrollTo({ top: el.offsetTop, behavior: "smooth" });
 }
 
 export default function WelcomeIntro() {

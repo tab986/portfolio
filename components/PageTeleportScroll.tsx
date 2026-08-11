@@ -5,14 +5,19 @@ import { useEffect } from "react";
 const SECTIONS = ["welcome", "terminal", "portfolio"] as const;
 type SectionId = (typeof SECTIONS)[number];
 
-const GESTURE_GAP_MS = 220;
-const ARRIVE_PAD_PX = 64;
-const PORTFOLIO_TOP_SLACK = 48;
-const WHEEL_THRESHOLD = 10;
-const MAX_ANIM_MS = 1400;
+const ARRIVE_PAD_PX = 80;
+const PORTFOLIO_TOP_SLACK = 56;
+const WHEEL_THRESHOLD = 12;
+const MAX_ANIM_MS = 1200;
+const COOLDOWN_MS = 320;
+const TOUCH_MIN_PX = 60;
+
+function scrollingRoot() {
+  return document.scrollingElement || document.documentElement;
+}
 
 function scrollY() {
-  return window.scrollY || document.documentElement.scrollTop || 0;
+  return scrollingRoot().scrollTop || window.scrollY || 0;
 }
 
 function sectionEl(id: SectionId) {
@@ -22,13 +27,11 @@ function sectionEl(id: SectionId) {
 function jumpTo(id: SectionId) {
   const el = sectionEl(id);
   if (!el) return;
-  window.scrollTo({ top: el.offsetTop, behavior: "smooth" });
+  scrollingRoot().scrollTo({ top: el.offsetTop, behavior: "smooth" });
 }
 
-/** Section that owns the top of the viewport. */
 function currentSectionIndex(): number {
   const y = scrollY() + 8;
-
   for (let i = SECTIONS.length - 1; i >= 0; i -= 1) {
     const el = sectionEl(SECTIONS[i]);
     if (!el) continue;
@@ -52,15 +55,14 @@ function hostCanScroll(host: HTMLElement, deltaY: number) {
 }
 
 /**
- * One physical wheel/swipe gesture moves exactly one page:
- * welcome → terminal → portfolio (and reverse).
+ * Snap between welcome ↔ terminal ↔ portfolio.
+ * While a snap is animating, wheel inertia is eaten; after it lands (or times
+ * out) scrolling works again. No permanent gesture lock.
  */
 export default function PageTeleportScroll() {
   useEffect(() => {
     let animating = false;
-    let gestureConsumed = false;
-    let lastEventAt = 0;
-    let lastDir: 1 | -1 | 0 = 0;
+    let cooldownUntil = 0;
     let arriveTimer = 0;
     let safetyTimer = 0;
     let touchAnchorY = 0;
@@ -74,6 +76,7 @@ export default function PageTeleportScroll() {
 
     const finishAnimation = () => {
       animating = false;
+      cooldownUntil = performance.now() + COOLDOWN_MS;
       clearArriveWatch();
     };
 
@@ -81,21 +84,12 @@ export default function PageTeleportScroll() {
       clearArriveWatch();
       arriveTimer = window.setInterval(() => {
         if (nearSection(id)) finishAnimation();
-      }, 48);
+      }, 40);
       safetyTimer = window.setTimeout(finishAnimation, MAX_ANIM_MS);
     };
 
-    const beginGestureWindow = (dir: 1 | -1) => {
-      const now = performance.now();
-      if (now - lastEventAt > GESTURE_GAP_MS || dir !== lastDir) {
-        gestureConsumed = false;
-      }
-      lastEventAt = now;
-      lastDir = dir;
-    };
-
     const tryTeleport = (dir: 1 | -1) => {
-      if (animating || gestureConsumed) return false;
+      if (animating || performance.now() < cooldownUntil) return false;
 
       const idx = currentSectionIndex();
       const next = idx + dir;
@@ -104,14 +98,13 @@ export default function PageTeleportScroll() {
       const portfolio = sectionEl("portfolio");
       const y = scrollY();
 
-      // Portfolio keeps native document scroll until its top edge.
+      // Inside portfolio: native document scroll first.
       if (SECTIONS[idx] === "portfolio" && portfolio) {
         if (dir === 1) return false;
         if (y > portfolio.offsetTop + PORTFOLIO_TOP_SLACK) return false;
       }
 
       const target = SECTIONS[next];
-      gestureConsumed = true;
       animating = true;
       jumpTo(target);
       watchArrive(target);
@@ -122,23 +115,20 @@ export default function PageTeleportScroll() {
       if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
       if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
 
-      const dir: 1 | -1 = e.deltaY > 0 ? 1 : -1;
-      beginGestureWindow(dir);
-
       const scrollHost = (e.target as HTMLElement | null)?.closest?.(
         "[data-terminal-scroll]",
       ) as HTMLElement | null;
-
       if (scrollHost && hostCanScroll(scrollHost, e.deltaY)) {
         return;
       }
 
-      // Eat inertia while animating or after this gesture already moved a page.
-      if (animating || gestureConsumed) {
+      // Lock only while snapping or during post-snap cooldown.
+      if (animating || performance.now() < cooldownUntil) {
         e.preventDefault();
         return;
       }
 
+      const dir: 1 | -1 = e.deltaY > 0 ? 1 : -1;
       const idx = currentSectionIndex();
       const portfolio = sectionEl("portfolio");
       const y = scrollY();
@@ -160,14 +150,13 @@ export default function PageTeleportScroll() {
     };
 
     const onTouchEnd = (e: TouchEvent) => {
-      if (animating) return;
+      if (animating || performance.now() < cooldownUntil) return;
+
       const endY = e.changedTouches[0]?.clientY ?? touchAnchorY;
       const delta = touchAnchorY - endY;
-      if (Math.abs(delta) < 56) return;
+      if (Math.abs(delta) < TOUCH_MIN_PX) return;
 
       const dir: 1 | -1 = delta > 0 ? 1 : -1;
-      beginGestureWindow(dir);
-
       const target = e.target as HTMLElement | null;
       const scrollHost = target?.closest?.(
         "[data-terminal-scroll]",
