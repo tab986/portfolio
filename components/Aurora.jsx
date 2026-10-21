@@ -176,8 +176,9 @@ export default function Aurora(props) {
     ctn.appendChild(gl.canvas);
 
     let animateId = 0;
-    const update = (t) => {
+      const update = (t) => {
       animateId = requestAnimationFrame(update);
+      if (document.hidden) return;
       const { time = t * 0.01, speed = 1.0 } = propsRef.current;
       program.uniforms.uTime.value = time * speed * 0.1;
       program.uniforms.uAmplitude.value = propsRef.current.amplitude ?? 1.0;

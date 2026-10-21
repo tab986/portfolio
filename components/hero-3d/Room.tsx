@@ -6,7 +6,7 @@ import { useGLTF, useTexture } from "@react-three/drei";
 import type { GLTF } from "three-stdlib";
 
 const ROOM_MODEL = "/hero-3d/models/optimized-room.glb";
-const MATCAP = "/hero-3d/textures/mat1.png";
+const MATCAP = "/hero-3d/textures/mat1.webp";
 
 type GLTFResult = GLTF & {
   nodes: {

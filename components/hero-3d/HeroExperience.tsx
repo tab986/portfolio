@@ -8,34 +8,44 @@ import { BlendFunction } from "postprocessing";
 import * as THREE from "three";
 import HeroLight from "@/components/hero-3d/HeroLight";
 import { Room } from "@/components/hero-3d/Room";
+import { useSectionVisible } from "@/components/hero-3d/useRenderActive";
 import { useMediaQuery } from "@/components/hero-3d/useMediaQuery";
 
-function PaintWhenStatic({ enabled }: { enabled: boolean }) {
+function PaintWhenStatic({
+  enabled,
+  visible,
+}: {
+  enabled: boolean;
+  visible: boolean;
+}) {
   const invalidate = useThree((state) => state.invalidate);
   useEffect(() => {
-    if (!enabled) return;
+    if (!visible) return;
     invalidate();
+    if (!enabled) return;
     const soon = window.setTimeout(invalidate, 350);
     const later = window.setTimeout(invalidate, 1100);
     return () => {
       window.clearTimeout(soon);
       window.clearTimeout(later);
     };
-  }, [enabled, invalidate]);
+  }, [enabled, visible, invalidate]);
   return null;
 }
 
 export default function HeroExperience() {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const renderActive = useSectionVisible("welcome");
   const screensRef = useRef<THREE.Mesh>(null);
+  const frameloop = !renderActive ? "never" : reduceMotion ? "demand" : "always";
 
   return (
     <Canvas
       className={`h-full w-full border-0 bg-transparent shadow-none ${isMobile ? "touch-pan-y" : "touch-none"}`}
       style={{ background: "transparent", border: "none", boxShadow: "none" }}
-      frameloop={reduceMotion ? "demand" : "always"}
-      dpr={[1, isMobile ? 1.25 : 1.5]}
+      frameloop={frameloop}
+      dpr={[1, 1.5]}
       performance={{ min: 0.5 }}
       gl={{
         antialias: true,
@@ -52,7 +62,7 @@ export default function HeroExperience() {
         fov: isMobile ? 40 : 43,
       }}
     >
-      <PaintWhenStatic enabled={reduceMotion} />
+      <PaintWhenStatic enabled={reduceMotion} visible={renderActive} />
       <OrbitControls
         enablePan={false}
         enableZoom={false}
