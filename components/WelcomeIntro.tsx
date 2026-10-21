@@ -3,7 +3,9 @@
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { FileDown } from "lucide-react";
 import HeroExperienceClient from "@/components/hero-3d/HeroExperienceClient";
+import { CONTACT_EMAIL, CV_FILENAME, CV_HREF } from "@/lib/site";
 
 const headlineClassName =
   "font-sans text-[clamp(1.65rem,8.2vw,4.75rem)] font-semibold leading-[1.08] tracking-tight text-warm-white sm:text-[clamp(2rem,5.5vw,4.75rem)] sm:leading-[1.05]";
@@ -78,11 +80,29 @@ export default function WelcomeIntro() {
             <p className="mt-3 hidden max-w-sm font-sans text-[0.9375rem] leading-relaxed text-chrome sm:mt-6 sm:text-sm md:text-base lg:block">
               Scroll into the CLI, then the ID card, stack, and contact.
             </p>
+            <div className="mt-4 flex flex-wrap gap-2 sm:mt-5">
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="tap-target glow-gold inline-flex min-h-11 cursor-pointer items-center justify-center bg-gold px-4 py-2.5 font-sans text-sm font-semibold text-obsidian transition-[box-shadow,transform] duration-300 motion-safe:hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+              >
+                Contact me
+              </a>
+              <a
+                href={CV_HREF}
+                download={CV_FILENAME}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="glass-panel tap-target inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 border border-gold/35 px-4 py-2.5 font-sans text-sm font-semibold text-warm-white transition-[border-color,box-shadow,transform,color] duration-300 motion-safe:hover:-translate-y-0.5 hover:border-gold hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+              >
+                <FileDown className="h-3.5 w-3.5 text-gold" aria-hidden />
+                Download CV
+              </a>
+            </div>
           </div>
         </div>
 
         <figure
-          aria-hidden={!sceneActive}
+          aria-label="3D workspace"
           className="relative min-h-0 w-full min-w-0 cursor-grab active:cursor-grabbing max-lg:h-full lg:col-span-8 lg:h-auto lg:min-h-0 xl:col-span-8"
         >
           <div className="welcome-room-stage absolute inset-0 overflow-hidden bg-transparent shadow-none lg:inset-y-0 lg:-right-8 lg:left-0 xl:-right-12">

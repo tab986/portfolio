@@ -1,6 +1,5 @@
 import { FileDown } from "lucide-react";
-
-const CV_HREF = "/cv/abdalrhmn-anwar-cv.pdf";
+import { CV_FILENAME, CV_HREF } from "@/lib/site";
 
 export default function HeroHeader() {
   return (
@@ -31,7 +30,7 @@ export default function HeroHeader() {
 
         <a
           href={CV_HREF}
-          download="Abdalrhmn-Anwar-CV.pdf"
+          download={CV_FILENAME}
           target="_blank"
           rel="noopener noreferrer"
           className="glass-panel group tap-target inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2.5 rounded-none border border-gold/35 px-5 py-3.5 font-sans text-sm font-semibold text-warm-white transition-[border-color,box-shadow,transform,color] duration-300 hover:-translate-y-0.5 hover:border-gold hover:text-gold hover:shadow-[0_0_28px_rgba(212,175,55,0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold sm:w-auto sm:justify-start"

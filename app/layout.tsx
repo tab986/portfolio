@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { metadataBase, SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -16,15 +17,27 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Abdalrhmn Anwar | Full Stack Developer",
-  description:
-    "Full Stack Developer based in Baghdad — architecting scalable backend systems & full-stack applications. Next.js, Node.js, PostgreSQL.",
+  metadataBase,
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  applicationName: "Abdalrhmn Anwar",
+  authors: [{ name: "Abdalrhmn Anwar Hameed" }],
+  creator: "Abdalrhmn Anwar Hameed",
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "Abdalrhmn Anwar | Full Stack Developer",
-    description:
-      "Full Stack Developer based in Baghdad. Next.js · Node.js · PostgreSQL.",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     type: "website",
+    url: "/",
+    siteName: "Abdalrhmn Anwar",
+    locale: "en_US",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
+  robots: { index: true, follow: true },
   // Site is already dark — stop Dark Reader from rewriting markup pre-hydrate
   other: {
     "darkreader-lock": "1",

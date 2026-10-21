@@ -1,3 +1,12 @@
+import {
+  CalendarDays,
+  ExternalLink,
+  GraduationCap,
+  Server,
+  Store,
+  type LucideIcon,
+} from "lucide-react";
+
 type ProjectLink = {
   label: string;
   href: string;
@@ -6,9 +15,11 @@ type ProjectLink = {
 type Project = {
   name: string;
   role: string;
-  detail: string;
+  summary: string;
+  stack: string[];
+  icon: LucideIcon;
+  tone: string;
   href?: string;
-  domain?: string;
   links?: ProjectLink[];
 };
 
@@ -16,7 +27,11 @@ const PROJECTS: Project[] = [
   {
     name: "TabibiQ",
     role: "Full-Stack Developer",
-    detail: "Medical Appointment Booking · Android & iOS",
+    summary:
+      "Patients search doctors by specialty and location, book visits, and get reminders that reduce waiting.",
+    stack: ["Android", "iOS"],
+    icon: CalendarDays,
+    tone: "from-[#2a3340] to-[#1a1a1a]",
     links: [
       {
         label: "Google Play",
@@ -31,72 +46,103 @@ const PROJECTS: Project[] = [
   {
     name: "Teryaq",
     role: "Full-Stack Developer",
-    detail: "Flutter POS · Ed25519 licensing · Wayl",
+    summary:
+      "Flutter point-of-sale app with Ed25519 licensing and Wayl payments on a Next.js billing site.",
+    stack: ["Flutter", "Ed25519", "Wayl", "Next.js", "PostgreSQL", "Cloudflare Workers"],
+    icon: Store,
+    tone: "from-[#3a3424] to-[#1a1a1a]",
   },
   {
     name: "Hala Teacher",
     role: "Front-End Developer",
-    detail: "Educational Website · Arabic (RTL)",
+    summary:
+      "Arabic RTL site for a 6th-preparatory English course, with plans, booklets, and exam resources.",
+    stack: ["Arabic (RTL)", "Cloudflare Workers"],
+    icon: GraduationCap,
+    tone: "from-[#243038] to-[#1a1a1a]",
     href: "https://www.halateacher.workers.dev/",
-    domain: "halateacher.workers.dev",
   },
   {
     name: "GameWiseIQ",
     role: "Backend Developer",
-    detail: "High availability & secure API integrations",
+    summary:
+      "Backend built for high availability, data processing, and secure API integrations.",
+    stack: [],
+    icon: Server,
+    tone: "from-[#2c2838] to-[#1a1a1a]",
     href: "https://gamewiseiq.com",
-    domain: "gamewiseiq.com",
   },
 ];
 
 const cardClassName =
-  "glass-panel group tap-target block w-full max-w-full rounded-lg p-4 transition-all duration-300 hover:border-gold/40 hover:shadow-[0_0_32px_rgba(212,175,55,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold sm:p-5";
+  "glass-panel group tap-target block w-full max-w-full overflow-hidden rounded-lg transition-all duration-300 hover:border-gold/40 hover:shadow-[0_0_32px_rgba(212,175,55,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold";
+
+const linkClassName =
+  "tap-target inline-flex min-h-11 items-center gap-1 rounded-sm font-mono text-xs text-react underline-offset-2 hover:text-gold hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold";
+
+function ProjectVisual({ project }: { project: Project }) {
+  const Icon = project.icon;
+  return (
+    <div
+      aria-hidden
+      className={`relative flex h-24 items-center justify-center bg-gradient-to-br ${project.tone}`}
+    >
+      <span className="grid h-12 w-12 place-items-center rounded-xl border border-white/10 bg-black/25 text-gold">
+        <Icon className="h-6 w-6" />
+      </span>
+    </div>
+  );
+}
 
 function ProjectBody({ project }: { project: Project }) {
   return (
     <>
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="font-sans text-[10px] font-medium uppercase tracking-[0.2em] text-chrome-dim">
-            {project.role}
+      <ProjectVisual project={project} />
+      <div className="p-4 sm:p-5">
+        <p className="font-sans text-[10px] font-medium uppercase tracking-[0.2em] text-chrome">
+          {project.role}
+        </p>
+        <h3 className="mt-2 break-words font-sans text-xl font-semibold tracking-tight text-warm-white transition-colors group-hover:text-gold sm:text-2xl">
+          {project.name}
+        </h3>
+        <p className="mt-2 font-sans text-sm leading-relaxed text-chrome">
+          {project.summary}
+        </p>
+        {project.stack.length > 0 ? (
+          <ul className="mt-3 flex flex-wrap gap-1.5">
+            {project.stack.map((item) => (
+              <li
+                key={item}
+                className="rounded-md border border-zinc-600/80 bg-zinc-900/80 px-2 py-1 font-sans text-[10px] font-medium uppercase tracking-[0.12em] text-zinc-200"
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {project.links ? (
+          <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+            {project.links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkClassName}
+              >
+                {link.label}
+                <ExternalLink className="h-3 w-3" aria-hidden />
+              </a>
+            ))}
           </p>
-          <h2 className="mt-2 break-words font-sans text-xl font-semibold tracking-tight text-warm-white transition-colors group-hover:text-gold sm:text-2xl">
-            {project.name}
-          </h2>
-          {project.domain ? (
-            <p className="mt-1 break-all font-mono text-xs text-react">
-              {project.domain}
-            </p>
-          ) : null}
-          {project.links ? (
-            <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
-              {project.links.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="break-all font-mono text-xs text-react underline-offset-2 hover:text-gold hover:underline"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </p>
-          ) : null}
-        </div>
+        ) : null}
         {project.href ? (
-          <span
-            aria-hidden
-            className="mt-1 shrink-0 text-chrome-dim transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-gold"
-          >
-            ↗
-          </span>
+          <p className="mt-3 inline-flex items-center gap-1 font-mono text-xs text-react">
+            <span className="break-all">{project.href.replace(/^https:\/\//, "")}</span>
+            <ExternalLink className="h-3 w-3 shrink-0" aria-hidden />
+          </p>
         ) : null}
       </div>
-
-      <span className="mt-4 inline-block max-w-full rounded-md border border-zinc-700/50 bg-zinc-900/80 px-2.5 py-1.5 font-sans text-[10px] font-medium uppercase leading-snug tracking-[0.12em] text-zinc-300">
-        {project.detail}
-      </span>
     </>
   );
 }
@@ -125,6 +171,9 @@ function ProjectEntry({ project }: { project: Project }) {
 export default function ProjectCard() {
   return (
     <div className="flex w-full flex-col gap-3">
+      <h2 className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-chrome">
+        Projects
+      </h2>
       {PROJECTS.map((project) => (
         <ProjectEntry key={project.name} project={project} />
       ))}
