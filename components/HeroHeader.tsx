@@ -10,9 +10,9 @@ export default function HeroHeader() {
         <span className="inline">Full-Stack Developer · Baghdad</span>
       </p>
 
-      <h1 className="animate-fade-up-delay-1 mt-4 break-words font-sans text-[clamp(1.55rem,7.2vw,3.35rem)] font-semibold leading-[1.12] tracking-tight text-warm-white sm:mt-6 sm:text-[clamp(1.9rem,4.4vw,3.35rem)] sm:leading-[1.08]">
+      <h2 className="animate-fade-up-delay-1 mt-4 break-words font-sans text-[clamp(1.55rem,7.2vw,3.35rem)] font-semibold leading-[1.12] tracking-tight text-warm-white sm:mt-6 sm:text-[clamp(1.9rem,4.4vw,3.35rem)] sm:leading-[1.08]">
         Architecting Scalable Backend Systems &amp; Full-Stack Applications.
-      </h1>
+      </h2>
 
       <p className="animate-fade-up-delay-1 mt-4 font-sans text-sm font-medium leading-relaxed tracking-wide text-chrome sm:mt-5 sm:text-[15px]">
         Abdalrhmn Anwar | Computer Engineering Technology (MTU)

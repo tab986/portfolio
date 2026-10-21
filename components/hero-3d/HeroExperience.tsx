@@ -11,25 +11,41 @@ import { Room } from "@/components/hero-3d/Room";
 import { useSectionVisible } from "@/components/hero-3d/useRenderActive";
 import { useMediaQuery } from "@/components/hero-3d/useMediaQuery";
 
-function PaintWhenStatic({
-  enabled,
-  visible,
-}: {
-  enabled: boolean;
-  visible: boolean;
-}) {
+function IntroFrames({ count, gapMs }: { count: number; gapMs: number }) {
   const invalidate = useThree((state) => state.invalidate);
+
   useEffect(() => {
-    if (!visible) return;
-    invalidate();
-    if (!enabled) return;
-    const soon = window.setTimeout(invalidate, 350);
-    const later = window.setTimeout(invalidate, 1100);
-    return () => {
-      window.clearTimeout(soon);
-      window.clearTimeout(later);
+    let framesLeft = count;
+    let last = 0;
+    let raf = 0;
+    const tick = (now: number) => {
+      if (framesLeft <= 0) return;
+      if (now - last >= gapMs) {
+        last = now;
+        framesLeft -= 1;
+        invalidate();
+      }
+      raf = requestAnimationFrame(tick);
     };
-  }, [enabled, visible, invalidate]);
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [count, gapMs, invalidate]);
+
+  return null;
+}
+
+function RedrawOnResize({ active }: { active: boolean }) {
+  const invalidate = useThree((state) => state.invalidate);
+  const gl = useThree((state) => state.gl);
+
+  useEffect(() => {
+    if (!active) return;
+    const observer = new ResizeObserver(() => invalidate());
+    observer.observe(gl.domElement);
+    invalidate();
+    return () => observer.disconnect();
+  }, [active, gl, invalidate]);
+
   return null;
 }
 
@@ -38,7 +54,11 @@ export default function HeroExperience() {
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const renderActive = useSectionVisible("welcome");
   const screensRef = useRef<THREE.Mesh>(null);
-  const frameloop = !renderActive ? "never" : reduceMotion ? "demand" : "always";
+  // Demand while on screen: draw the settled room, then idle.
+  // Never while offscreen or the tab is hidden. OrbitControls invalidates during a drag.
+  const frameloop = renderActive ? "demand" : "never";
+  const introFrames = reduceMotion ? 1 : isMobile ? 4 : 3;
+  const introGapMs = isMobile ? 1000 / 30 : 0;
 
   return (
     <Canvas
@@ -62,7 +82,7 @@ export default function HeroExperience() {
         fov: isMobile ? 40 : 43,
       }}
     >
-      <PaintWhenStatic enabled={reduceMotion} visible={renderActive} />
+      <RedrawOnResize active={renderActive} />
       <OrbitControls
         enablePan={false}
         enableZoom={false}
@@ -82,6 +102,7 @@ export default function HeroExperience() {
         >
           <Room screensRef={screensRef} />
         </group>
+        <IntroFrames count={introFrames} gapMs={introGapMs} />
       </Suspense>
       {!isMobile && (
         <EffectComposer>
