@@ -43,7 +43,7 @@ export default function HeroExperience() {
       <Suspense fallback={null}>
         <group
           scale={isMobile ? 1.05 : 0.82}
-          position={isMobile ? [0.02, -2.25, 0] : [1.2, -2.1, 0]}
+          position={isMobile ? [0.02, -3, 0] : [1.2, -2.1, 0]}
           rotation={[0, -Math.PI / 4, 0]}
         >
           <Room screensRef={screensRef} />
