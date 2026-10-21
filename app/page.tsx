@@ -28,8 +28,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="order-2 flex w-full min-w-0 flex-col items-center justify-center lg:order-none lg:col-span-7 lg:items-end xl:col-span-8">
-            {/* Desktop offsets unchanged; mobile centers and contains the stage */}
+          <div className="hidden w-full min-w-0 flex-col items-center justify-center lg:order-none lg:col-span-7 lg:flex lg:items-end xl:col-span-8">
             <div className="mx-auto w-full max-w-[100vw] overflow-hidden lg:mx-0 lg:max-w-[760px] lg:-mr-2 lg:overflow-visible xl:-mr-6">
               <LanyardCardClient />
             </div>
