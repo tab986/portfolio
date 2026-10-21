@@ -52,7 +52,7 @@ export default function Home() {
             >
               CV / Resume
             </a>
-            <span className="text-chrome">React · Node.js · PostgreSQL</span>
+            <span className="text-chrome">Next.js · Node.js · PostgreSQL</span>
           </div>
         </footer>
       </section>
