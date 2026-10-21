@@ -29,8 +29,34 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploy on Cloudflare Workers
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This app deploys with [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare) and Wrangler.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Build the Worker locally (no Cloudflare account required):
+
+```bash
+npm run build:cloudflare
+```
+
+Preview it in the Workers runtime:
+
+```bash
+npm run preview
+```
+
+Deploy:
+
+```bash
+npm run deploy
+```
+
+`npm run deploy` needs a Cloudflare API token with the **Edit Cloudflare Workers** permission, plus the account id if Wrangler cannot infer it. Create a token at [dash.cloudflare.com/profile/api-tokens](https://dash.cloudflare.com/profile/api-tokens) from the Edit Cloudflare Workers template, then:
+
+```bash
+export CLOUDFLARE_API_TOKEN=...
+export CLOUDFLARE_ACCOUNT_ID=...   # account id from the dashboard URL or Workers overview
+npm run deploy
+```
+
+You can also connect the GitHub repository in the [Cloudflare dashboard](https://developers.cloudflare.com/workers/ci-cd/builds/) so merges to `main` build and deploy automatically. The Worker name is `portfolio` (`wrangler.jsonc`). No R2 bucket is required: prerendered pages use the static-assets incremental cache.

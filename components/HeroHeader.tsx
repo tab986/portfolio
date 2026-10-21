@@ -8,7 +8,7 @@ export default function HeroHeader() {
       <p className="animate-fade-up font-sans text-[10px] font-medium uppercase leading-relaxed tracking-[0.14em] text-chrome sm:text-[11px] sm:tracking-[0.22em] sm:text-xs">
         <span className="text-warm-white">Abdalrhmn Anwar</span>
         <span className="mx-1.5 text-chrome-dim sm:mx-2">|</span>
-        <span className="inline">Full Stack Developer · Baghdad</span>
+        <span className="inline">Full-Stack Developer · Baghdad</span>
       </p>
 
       <h1 className="animate-fade-up-delay-1 mt-4 break-words font-sans text-[clamp(1.55rem,7.2vw,3.35rem)] font-semibold leading-[1.12] tracking-tight text-warm-white sm:mt-6 sm:text-[clamp(1.9rem,4.4vw,3.35rem)] sm:leading-[1.08]">

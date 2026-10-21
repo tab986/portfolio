@@ -18,11 +18,11 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Abdalrhmn Anwar | Full Stack Developer",
   description:
-    "Full Stack Developer based in Baghdad — architecting scalable backend systems & full-stack applications. React, Node.js, PostgreSQL.",
+    "Full Stack Developer based in Baghdad — architecting scalable backend systems & full-stack applications. Next.js, Node.js, PostgreSQL.",
   openGraph: {
     title: "Abdalrhmn Anwar | Full Stack Developer",
     description:
-      "Full Stack Developer based in Baghdad. React · Node.js · PostgreSQL.",
+      "Full Stack Developer based in Baghdad. Next.js · Node.js · PostgreSQL.",
     type: "website",
   },
   // Site is already dark — stop Dark Reader from rewriting markup pre-hydrate

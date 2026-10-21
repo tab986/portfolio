@@ -16,18 +16,24 @@ export default function HeroExperience() {
 
   return (
     <Canvas
-      className={`h-full w-full bg-transparent ${isMobile ? "touch-pan-y" : "touch-none"}`}
-      style={{ background: "transparent" }}
+      className={`h-full w-full border-0 bg-transparent shadow-none ${isMobile ? "touch-pan-y" : "touch-none"}`}
+      style={{ background: "transparent", border: "none", boxShadow: "none" }}
       frameloop="always"
       dpr={[1, isMobile ? 1.25 : 1.5]}
       performance={{ min: 0.5 }}
-      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-      onCreated={({ gl }) => {
+      gl={{
+        antialias: true,
+        alpha: true,
+        premultipliedAlpha: !isMobile,
+        powerPreference: "high-performance",
+      }}
+      onCreated={({ gl, scene }) => {
+        scene.background = null;
         gl.setClearColor(0x000000, 0);
       }}
       camera={{
-        position: isMobile ? [0, 2, 18] : [0, 2, 15],
-        fov: 43,
+        position: isMobile ? [0, 1.45, 10.2] : [0, 2, 15],
+        fov: isMobile ? 40 : 43,
       }}
     >
       <OrbitControls
@@ -42,8 +48,8 @@ export default function HeroExperience() {
       <HeroLight />
       <Suspense fallback={null}>
         <group
-          scale={isMobile ? 0.58 : 0.82}
-          position={isMobile ? [0.4, -2.2, 0] : [1.2, -2.1, 0]}
+          scale={isMobile ? 1.05 : 0.82}
+          position={isMobile ? [0.02, -2.75, 0] : [1.2, -2.1, 0]}
           rotation={[0, -Math.PI / 4, 0]}
         >
           <Room screensRef={screensRef} />
