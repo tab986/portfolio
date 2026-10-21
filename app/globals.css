@@ -14,7 +14,8 @@
   --react: #38bdf8;
   --node: #22c55e;
   --chrome: #a3a3a3;
-  --chrome-dim: #737373;
+  /* #737373 on #1a1a1a is about 3.7:1. #8f8f8f clears 4.5:1 for small labels. */
+  --chrome-dim: #8f8f8f;
   --surface: rgba(255, 255, 255, 0.04);
   --surface-border: rgba(255, 255, 255, 0.1);
   --glass: rgba(26, 26, 26, 0.55);
@@ -356,11 +357,16 @@ svg {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   .animate-fade-up,
   .animate-fade-up-delay-1,
   .animate-fade-up-delay-2,
   .animate-scroll-line,
   .animate-hint-pulse,
+  .animate-pulse,
   .graph-edge,
   .graph-node,
   .graph-node-delay-1,

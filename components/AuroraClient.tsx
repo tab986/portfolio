@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { useMediaQuery } from "@/components/hero-3d/useMediaQuery";
 
 const Aurora = dynamic(() => import("@/components/Aurora"), {
   ssr: false,
@@ -12,14 +13,16 @@ const Aurora = dynamic(() => import("@/components/Aurora"), {
  * Delayed briefly so the welcome 3D room can claim a WebGL context first.
  */
 export default function AuroraClient() {
+  const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    if (reduceMotion) return;
     const id = window.setTimeout(() => setReady(true), 900);
     return () => window.clearTimeout(id);
-  }, []);
+  }, [reduceMotion]);
 
-  if (!ready) return null;
+  if (reduceMotion || !ready) return null;
 
   return (
     <div

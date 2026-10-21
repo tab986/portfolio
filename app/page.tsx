@@ -1,4 +1,5 @@
 import AuroraClient from "@/components/AuroraClient";
+import { CV_FILENAME, CV_HREF } from "@/lib/site";
 import HeroHeader from "@/components/HeroHeader";
 import PageTeleportScroll from "@/components/PageTeleportScroll";
 import PortfolioTerminal from "@/components/PortfolioTerminal";
@@ -43,8 +44,8 @@ export default function Home() {
           <span>Abdalrhmn Anwar · Baghdad</span>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <a
-              href="/cv/abdalrhmn-anwar-cv.pdf"
-              download="Abdalrhmn-Anwar-CV.pdf"
+              href={CV_HREF}
+              download={CV_FILENAME}
               target="_blank"
               rel="noopener noreferrer"
               className="tap-target inline-flex min-h-11 cursor-pointer items-center text-chrome transition-colors duration-300 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"

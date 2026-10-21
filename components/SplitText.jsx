@@ -48,6 +48,11 @@ const SplitText = ({
       if (!ref.current || !text || !fontsLoaded) return;
       // Prevent re-animation if already completed
       if (animationCompletedRef.current) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        animationCompletedRef.current = true;
+        onCompleteRef.current?.();
+        return;
+      }
       const el = ref.current;
 
       if (el._rbsplitInstance) {

@@ -36,6 +36,7 @@ type BandProps = {
   maxSpeed?: number;
   minSpeed?: number;
   isMobile?: boolean;
+  reduceMotion?: boolean;
 };
 
 type RigidBodyWithLerped = RapierRigidBody & {
@@ -50,6 +51,7 @@ function Band({
   maxSpeed = 50,
   minSpeed = 10,
   isMobile = false,
+  reduceMotion = false,
 }: BandProps) {
   const band = useRef<THREE.Mesh>(null);
   const fixed = useRef<RapierRigidBody>(null);
@@ -120,13 +122,25 @@ function Band({
     cardTexture.anisotropy = 8;
     cardTexture.needsUpdate = true;
 
-    bandGeometry.setPoints([
-      new THREE.Vector3(3.5, 4, 0),
-      new THREE.Vector3(3.0, 4, 0),
-      new THREE.Vector3(2.5, 4, 0),
-      new THREE.Vector3(1.5, 4, 0),
-    ]);
-  }, [texture, cardTexture, bandGeometry]);
+    if (reduceMotion) {
+      const origin = isMobile
+        ? new THREE.Vector3(0, 3.25, 0)
+        : new THREE.Vector3(1.5, 4, 0);
+      bandGeometry.setPoints([
+        origin.clone().add(new THREE.Vector3(0, -3, 0)),
+        origin.clone().add(new THREE.Vector3(0, -2, 0)),
+        origin.clone().add(new THREE.Vector3(0, -1, 0)),
+        origin.clone(),
+      ]);
+    } else {
+      bandGeometry.setPoints([
+        new THREE.Vector3(3.5, 4, 0),
+        new THREE.Vector3(3.0, 4, 0),
+        new THREE.Vector3(2.5, 4, 0),
+        new THREE.Vector3(1.5, 4, 0),
+      ]);
+    }
+  }, [texture, cardTexture, bandGeometry, reduceMotion, isMobile]);
 
   useEffect(() => {
     gl.domElement.style.touchAction = dragged ? "none" : "pan-y";
@@ -142,6 +156,7 @@ function Band({
   }, [hovered, dragged]);
 
   useFrame((state, delta) => {
+    if (reduceMotion) return;
     if (dragged && card.current) {
       vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);
       dir.copy(vec).sub(state.camera.position).normalize();
@@ -224,54 +239,75 @@ function Band({
     }
   });
 
-  // Mobile: centered hang slightly lower so content sits mid-frame in 80dvh stage.
-  // Desktop: original right-biased hang for the side camera.
   const hangOrigin = isMobile ? ([0, 3.25, 0] as const) : ([1.5, 4, 0] as const);
   const lineWidth = isMobile ? 0.45 : 1;
+  const rest = reduceMotion
+    ? {
+        j1: [0, -1, 0] as const,
+        j2: [0, -2, 0] as const,
+        j3: [0, -3, 0] as const,
+        card: [0, -4.1, 0] as const,
+        bodyType: "fixed" as const,
+      }
+    : {
+        j1: [0.5, 0, 0] as const,
+        j2: [1, 0, 0] as const,
+        j3: [1.5, 0, 0] as const,
+        card: [2, 0, 0] as const,
+        bodyType: "dynamic" as const,
+      };
 
   return (
     <>
       <group position={hangOrigin}>
         <RigidBody ref={fixed} {...segmentProps} type="fixed" />
-        <RigidBody position={[0.5, 0, 0]} ref={j1} {...segmentProps}>
+        <RigidBody position={rest.j1} ref={j1} {...segmentProps} type={rest.bodyType}>
           <BallCollider args={[0.1]} />
         </RigidBody>
-        <RigidBody position={[1, 0, 0]} ref={j2} {...segmentProps}>
+        <RigidBody position={rest.j2} ref={j2} {...segmentProps} type={rest.bodyType}>
           <BallCollider args={[0.1]} />
         </RigidBody>
-        <RigidBody position={[1.5, 0, 0]} ref={j3} {...segmentProps}>
+        <RigidBody position={rest.j3} ref={j3} {...segmentProps} type={rest.bodyType}>
           <BallCollider args={[0.1]} />
         </RigidBody>
         <RigidBody
-          position={[2, 0, 0]}
+          position={rest.card}
           ref={card}
           {...segmentProps}
-          type={dragged ? "kinematicPosition" : "dynamic"}
+          type={reduceMotion ? "fixed" : dragged ? "kinematicPosition" : "dynamic"}
         >
           <CuboidCollider args={[0.8, 1.125, 0.01]} />
           <group
             scale={2.7}
             position={[0, -1.2, -0.05]}
-            onPointerOver={() => hover(true)}
-            onPointerOut={() => hover(false)}
-            onPointerUp={(e) => {
-              (e.target as Element).releasePointerCapture(e.pointerId);
-              drag(false);
-            }}
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              (e.target as Element).setPointerCapture(e.pointerId);
-              const offset = new THREE.Vector3()
-                .copy(e.point)
-                .sub(vec.copy(card.current!.translation()));
-              // Limit initial grab offset on mobile so the card can't sling off-screen.
-              if (isMobile) {
-                offset.x = THREE.MathUtils.clamp(offset.x, -0.65, 0.65);
-                offset.y = THREE.MathUtils.clamp(offset.y, -0.65, 0.65);
-                offset.z = THREE.MathUtils.clamp(offset.z, -0.35, 0.35);
-              }
-              drag(offset);
-            }}
+            onPointerOver={reduceMotion ? undefined : () => hover(true)}
+            onPointerOut={reduceMotion ? undefined : () => hover(false)}
+            onPointerUp={
+              reduceMotion
+                ? undefined
+                : (e) => {
+                    (e.target as Element).releasePointerCapture(e.pointerId);
+                    drag(false);
+                  }
+            }
+            onPointerDown={
+              reduceMotion
+                ? undefined
+                : (e) => {
+                    e.stopPropagation();
+                    (e.target as Element).setPointerCapture(e.pointerId);
+                    const offset = new THREE.Vector3()
+                      .copy(e.point)
+                      .sub(vec.copy(card.current!.translation()));
+                    // Limit initial grab offset on mobile so the card can't sling off-screen.
+                    if (isMobile) {
+                      offset.x = THREE.MathUtils.clamp(offset.x, -0.65, 0.65);
+                      offset.y = THREE.MathUtils.clamp(offset.y, -0.65, 0.65);
+                      offset.z = THREE.MathUtils.clamp(offset.z, -0.35, 0.35);
+                    }
+                    drag(offset);
+                  }
+            }
           >
             <mesh geometry={nodes.card.geometry}>
               <meshPhysicalMaterial
@@ -399,8 +435,24 @@ function CardFallback() {
   );
 }
 
+function StaticCardPaint({ enabled }: { enabled: boolean }) {
+  const invalidate = useThree((state) => state.invalidate);
+  useEffect(() => {
+    if (!enabled) return;
+    invalidate();
+    const soon = window.setTimeout(invalidate, 400);
+    const later = window.setTimeout(invalidate, 1200);
+    return () => {
+      window.clearTimeout(soon);
+      window.clearTimeout(later);
+    };
+  }, [enabled, invalidate]);
+  return null;
+}
+
 export default function LanyardCard() {
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
   return (
     <div className="lanyard-card relative flex w-full max-w-[100vw] flex-col items-center overflow-hidden bg-transparent">
@@ -446,16 +498,23 @@ export default function LanyardCard() {
               display: "block",
             }}
             dpr={isMobile ? [1, 1.25] : [1, 1.5]}
+            frameloop={reduceMotion ? "demand" : "always"}
             resize={{ scroll: false, debounce: { scroll: 0, resize: 0 } }}
           >
             <ResponsiveCardCamera isMobile={isMobile} />
+            <StaticCardPaint enabled={reduceMotion} />
             <ambientLight intensity={Math.PI * 0.7} />
             <directionalLight position={[5, 8, 5]} intensity={1.6} />
             <directionalLight position={[-6, 3, 2]} intensity={0.7} />
             <pointLight position={[0, 2, 6]} intensity={2.2} />
             <Suspense fallback={null}>
-              <Physics interpolate gravity={[0, -40, 0]} timeStep={1 / 60}>
-                <Band isMobile={isMobile} />
+              <Physics
+                paused={reduceMotion}
+                interpolate
+                gravity={[0, reduceMotion ? 0 : -40, 0]}
+                timeStep={1 / 60}
+              >
+                <Band isMobile={isMobile} reduceMotion={reduceMotion} />
               </Physics>
             </Suspense>
           </Canvas>

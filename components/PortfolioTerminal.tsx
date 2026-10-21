@@ -47,7 +47,7 @@ function OutputLines({ lines }: { lines: TerminalLine[] }) {
                 href={line.href}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
-                className="tap-target inline-flex min-h-11 items-center py-1 text-gold underline-offset-2 transition-colors hover:text-warm-white hover:underline"
+                className="tap-target inline-flex min-h-11 items-center rounded-sm py-1 text-gold underline-offset-2 transition-colors hover:text-warm-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
               >
                 {line.label}
               </a>
@@ -122,6 +122,24 @@ export default function PortfolioTerminal() {
       setShowPrompt(true);
       setPlaying(true);
       setDone(false);
+
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      if (reduceMotion) {
+        setHistory(
+          TERMINAL_SEQUENCE.flatMap((block) => [
+            { kind: "command" as const, text: block.command },
+            { kind: "output" as const, lines: block.lines },
+          ]),
+        );
+        setTypedCommand("");
+        setShowPrompt(true);
+        setPlaying(false);
+        setDone(true);
+        return;
+      }
 
       try {
         await sleep(400, signal);
@@ -224,7 +242,7 @@ export default function PortfolioTerminal() {
               type="button"
               onClick={handleReplay}
               disabled={playing || !done}
-              className="tap-target shrink-0 px-2 font-mono text-[10px] uppercase tracking-[0.18em] text-chrome transition-colors hover:text-gold disabled:cursor-not-allowed disabled:opacity-40 sm:px-3"
+              className="tap-target shrink-0 rounded-sm px-2 font-mono text-[10px] uppercase tracking-[0.18em] text-chrome transition-colors hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold disabled:cursor-not-allowed disabled:opacity-40 sm:px-3"
             >
               Replay
             </button>

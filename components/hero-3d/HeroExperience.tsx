@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useRef } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Suspense, useEffect, useRef } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { EffectComposer, SelectiveBloom } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
@@ -10,15 +10,31 @@ import HeroLight from "@/components/hero-3d/HeroLight";
 import { Room } from "@/components/hero-3d/Room";
 import { useMediaQuery } from "@/components/hero-3d/useMediaQuery";
 
+function PaintWhenStatic({ enabled }: { enabled: boolean }) {
+  const invalidate = useThree((state) => state.invalidate);
+  useEffect(() => {
+    if (!enabled) return;
+    invalidate();
+    const soon = window.setTimeout(invalidate, 350);
+    const later = window.setTimeout(invalidate, 1100);
+    return () => {
+      window.clearTimeout(soon);
+      window.clearTimeout(later);
+    };
+  }, [enabled, invalidate]);
+  return null;
+}
+
 export default function HeroExperience() {
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const screensRef = useRef<THREE.Mesh>(null);
 
   return (
     <Canvas
       className={`h-full w-full border-0 bg-transparent shadow-none ${isMobile ? "touch-pan-y" : "touch-none"}`}
       style={{ background: "transparent", border: "none", boxShadow: "none" }}
-      frameloop="always"
+      frameloop={reduceMotion ? "demand" : "always"}
       dpr={[1, isMobile ? 1.25 : 1.5]}
       performance={{ min: 0.5 }}
       gl={{
@@ -36,10 +52,12 @@ export default function HeroExperience() {
         fov: isMobile ? 40 : 43,
       }}
     >
+      <PaintWhenStatic enabled={reduceMotion} />
       <OrbitControls
         enablePan={false}
         enableZoom={false}
-        enableRotate={!isMobile}
+        enableRotate={!isMobile && !reduceMotion}
+        autoRotate={false}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 2}
         maxDistance={20}
