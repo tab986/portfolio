@@ -11,6 +11,9 @@ const WHEEL_THRESHOLD = 12;
 const MAX_ANIM_MS = 1200;
 const COOLDOWN_MS = 320;
 const TOUCH_MIN_PX = 60;
+/** Snap only for mouse-style desktops. Phones, tablets, and touch screens scroll natively. */
+const DESKTOP_SNAP_QUERY =
+  "(min-width: 1024px) and (hover: hover) and (pointer: fine)";
 
 function scrollingRoot() {
   return document.scrollingElement || document.documentElement;
@@ -55,17 +58,21 @@ function hostCanScroll(host: HTMLElement, deltaY: number) {
 }
 
 /**
- * Snap between welcome ↔ terminal ↔ portfolio.
+ * Desktop snap between welcome, terminal, and portfolio.
+ * Narrow screens and touch devices keep native scrolling. Section animations
+ * still start from their own intersection observers.
  * While a snap is animating, wheel inertia is eaten; after it lands (or times
  * out) scrolling works again. No permanent gesture lock.
  */
 export default function PageTeleportScroll() {
   useEffect(() => {
+    const desktopSnap = window.matchMedia(DESKTOP_SNAP_QUERY);
     let animating = false;
     let cooldownUntil = 0;
     let arriveTimer = 0;
     let safetyTimer = 0;
     let touchAnchorY = 0;
+    let listening = false;
 
     const clearArriveWatch = () => {
       window.clearInterval(arriveTimer);
@@ -166,15 +173,31 @@ export default function PageTeleportScroll() {
       tryTeleport(dir);
     };
 
-    window.addEventListener("wheel", onWheel, { passive: false });
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchend", onTouchEnd, { passive: true });
-
-    return () => {
+    const stopListening = () => {
+      if (!listening) return;
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchend", onTouchEnd);
+      listening = false;
+      animating = false;
       clearArriveWatch();
+    };
+
+    const syncSnap = () => {
+      stopListening();
+      if (!desktopSnap.matches) return;
+      window.addEventListener("wheel", onWheel, { passive: false });
+      window.addEventListener("touchstart", onTouchStart, { passive: true });
+      window.addEventListener("touchend", onTouchEnd, { passive: true });
+      listening = true;
+    };
+
+    syncSnap();
+    desktopSnap.addEventListener("change", syncSnap);
+
+    return () => {
+      desktopSnap.removeEventListener("change", syncSnap);
+      stopListening();
     };
   }, []);
 
