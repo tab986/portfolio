@@ -26,8 +26,8 @@ export default function HeroExperience() {
         gl.setClearColor(0x000000, 0);
       }}
       camera={{
-        position: isMobile ? [0, 2, 18] : [0, 2, 15],
-        fov: 43,
+        position: isMobile ? [0, 1.45, 10.2] : [0, 2, 15],
+        fov: isMobile ? 40 : 43,
       }}
     >
       <OrbitControls
@@ -42,8 +42,8 @@ export default function HeroExperience() {
       <HeroLight />
       <Suspense fallback={null}>
         <group
-          scale={isMobile ? 0.81 : 0.82}
-          position={isMobile ? [0.4, -2.2, 0] : [1.2, -2.1, 0]}
+          scale={isMobile ? 1.05 : 0.82}
+          position={isMobile ? [0.02, -2.25, 0] : [1.2, -2.1, 0]}
           rotation={[0, -Math.PI / 4, 0]}
         >
           <Room screensRef={screensRef} />

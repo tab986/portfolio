@@ -55,7 +55,7 @@ export default function WelcomeIntro() {
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_85%_65%_at_72%_42%,rgba(54,54,54,0.55),transparent_68%),radial-gradient(ellipse_55%_45%_at_18%_78%,rgba(212,175,55,0.05),transparent_62%),#1a1a1a]"
       />
 
-      <div className="relative mx-auto grid h-full w-full max-w-[90rem] flex-1 grid-cols-1 content-start items-stretch gap-2 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:gap-4 sm:px-8 lg:grid-cols-12 lg:content-stretch lg:gap-6 lg:px-8 lg:pb-8 lg:pt-0 xl:gap-8 xl:px-12">
+      <div className="relative mx-auto grid h-full w-full max-w-[90rem] flex-1 grid-cols-1 content-start items-stretch gap-2 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:gap-4 sm:px-8 max-lg:grid-rows-[auto_minmax(0,1fr)] max-lg:content-stretch lg:grid-cols-12 lg:grid-rows-none lg:content-stretch lg:gap-6 lg:px-8 lg:pb-8 lg:pt-0 xl:gap-8 xl:px-12">
         <div className="relative z-20 flex shrink-0 flex-col justify-center pt-2 lg:col-span-4 lg:pt-0 xl:col-span-4">
           <div className="max-w-md lg:max-w-none">
             <SplitText
@@ -83,7 +83,7 @@ export default function WelcomeIntro() {
 
         <figure
           aria-hidden={!sceneActive}
-          className="relative min-h-[38vh] w-full min-w-0 flex-1 cursor-grab active:cursor-grabbing sm:min-h-[44vh] lg:col-span-8 lg:min-h-0 xl:col-span-8"
+          className="relative min-h-0 w-full min-w-0 cursor-grab active:cursor-grabbing max-lg:h-full lg:col-span-8 lg:h-auto lg:min-h-0 xl:col-span-8"
         >
           <div className="absolute inset-0 overflow-hidden lg:inset-y-0 lg:-right-8 lg:left-0 xl:-right-12">
             {sceneActive ? (
