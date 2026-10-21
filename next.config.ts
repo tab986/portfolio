@@ -7,5 +7,7 @@ const nextConfig: NextConfig = {
 
 export default nextConfig;
 
-// Local Next.js dev can read wrangler bindings. The helper no-ops outside `next dev`.
-initOpenNextCloudflareForDev();
+// Wrangler bindings are only for `next dev`. Vercel runs `next build` and must not boot Miniflare.
+if (process.argv.includes("dev")) {
+  initOpenNextCloudflareForDev();
+}

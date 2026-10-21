@@ -85,7 +85,7 @@ export default function WelcomeIntro() {
           aria-hidden={!sceneActive}
           className="relative min-h-0 w-full min-w-0 cursor-grab active:cursor-grabbing max-lg:h-full lg:col-span-8 lg:h-auto lg:min-h-0 xl:col-span-8"
         >
-          <div className="absolute inset-0 overflow-hidden lg:inset-y-0 lg:-right-8 lg:left-0 xl:-right-12">
+          <div className="welcome-room-stage absolute inset-0 overflow-hidden bg-transparent shadow-none lg:inset-y-0 lg:-right-8 lg:left-0 xl:-right-12">
             {sceneActive ? (
               <HeroExperienceClient />
             ) : (

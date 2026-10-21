@@ -16,13 +16,19 @@ export default function HeroExperience() {
 
   return (
     <Canvas
-      className={`h-full w-full bg-transparent ${isMobile ? "touch-pan-y" : "touch-none"}`}
-      style={{ background: "transparent" }}
+      className={`h-full w-full border-0 bg-transparent shadow-none ${isMobile ? "touch-pan-y" : "touch-none"}`}
+      style={{ background: "transparent", border: "none", boxShadow: "none" }}
       frameloop="always"
       dpr={[1, isMobile ? 1.25 : 1.5]}
       performance={{ min: 0.5 }}
-      gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-      onCreated={({ gl }) => {
+      gl={{
+        antialias: true,
+        alpha: true,
+        premultipliedAlpha: !isMobile,
+        powerPreference: "high-performance",
+      }}
+      onCreated={({ gl, scene }) => {
+        scene.background = null;
         gl.setClearColor(0x000000, 0);
       }}
       camera={{

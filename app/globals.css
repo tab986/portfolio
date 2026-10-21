@@ -164,6 +164,28 @@ svg {
   background: transparent !important;
 }
 
+/* Phones and tablets: the welcome room fades into the page instead of ending in a canvas rectangle. */
+@media (max-width: 768px) {
+  .welcome-room-stage,
+  .welcome-room-stage canvas {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    outline: none;
+  }
+
+  .welcome-room-stage {
+    -webkit-mask-image:
+      linear-gradient(to right, transparent, #000 32px, #000 calc(100% - 32px), transparent),
+      linear-gradient(to bottom, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent, #000 32px, #000 calc(100% - 32px), transparent),
+      linear-gradient(to bottom, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+    mask-composite: intersect;
+  }
+}
+
 /* Mobile-only Canvas stage — desktop heights/layout untouched (≥769px) */
 @media (max-width: 768px) {
   .lanyard-card {
