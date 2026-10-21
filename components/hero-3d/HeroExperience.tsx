@@ -11,9 +11,7 @@ import { Room } from "@/components/hero-3d/Room";
 import { useMediaQuery } from "@/components/hero-3d/useMediaQuery";
 
 export default function HeroExperience() {
-  // Below the desktop layout the room is framed to fill the welcome stage.
-  // The desktop camera, scale, and bloom stay on the original values.
-  const isMobile = useMediaQuery("(max-width: 1023px)");
+  const isMobile = useMediaQuery("(max-width: 768px)");
   const screensRef = useRef<THREE.Mesh>(null);
 
   return (
@@ -28,8 +26,8 @@ export default function HeroExperience() {
         gl.setClearColor(0x000000, 0);
       }}
       camera={{
-        position: isMobile ? [0, 1.15, 8.4] : [0, 2, 15],
-        fov: isMobile ? 36 : 43,
+        position: isMobile ? [0, 2, 18] : [0, 2, 15],
+        fov: 43,
       }}
     >
       <OrbitControls
@@ -44,8 +42,8 @@ export default function HeroExperience() {
       <HeroLight />
       <Suspense fallback={null}>
         <group
-          scale={isMobile ? 1.22 : 0.82}
-          position={isMobile ? [0, -0.85, 0] : [1.2, -2.1, 0]}
+          scale={isMobile ? 0.81 : 0.82}
+          position={isMobile ? [0.4, -2.2, 0] : [1.2, -2.1, 0]}
           rotation={[0, -Math.PI / 4, 0]}
         >
           <Room screensRef={screensRef} />
