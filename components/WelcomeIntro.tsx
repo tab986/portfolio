@@ -2,8 +2,21 @@
 
 import type { MouseEvent } from "react";
 import { useEffect, useState } from "react";
-import SplitText from "@/components/SplitText";
+import dynamic from "next/dynamic";
 import HeroExperienceClient from "@/components/hero-3d/HeroExperienceClient";
+
+const headlineClassName =
+  "font-sans text-[clamp(1.65rem,8.2vw,4.75rem)] font-semibold leading-[1.08] tracking-tight text-warm-white sm:text-[clamp(2rem,5.5vw,4.75rem)] sm:leading-[1.05]";
+
+// GSAP registers plugins at import time. Keep that off the Worker SSR graph.
+const SplitText = dynamic(() => import("@/components/SplitText"), {
+  ssr: false,
+  loading: () => (
+    <p className={headlineClassName} style={{ textAlign: "left" }}>
+      welcome to Abdalrhman portfolio
+    </p>
+  ),
+});
 
 function teleportToTerminal(e: MouseEvent<HTMLAnchorElement>) {
   e.preventDefault();
@@ -47,7 +60,7 @@ export default function WelcomeIntro() {
           <div className="max-w-md lg:max-w-none">
             <SplitText
               text="welcome to Abdalrhman portfolio"
-              className="font-sans text-[clamp(1.65rem,8.2vw,4.75rem)] font-semibold leading-[1.08] tracking-tight text-warm-white sm:text-[clamp(2rem,5.5vw,4.75rem)] sm:leading-[1.05]"
+              className={headlineClassName}
               delay={80}
               duration={0.7}
               ease="power3.out"
