@@ -24,13 +24,14 @@ import {
   type RapierRigidBody,
 } from "@react-three/rapier";
 import { MeshLineGeometry, MeshLineMaterial } from "meshline";
+import { useDocumentVisible } from "@/components/hero-3d/useRenderActive";
 import { useMediaQuery } from "@/components/hero-3d/useMediaQuery";
 
 extend({ MeshLineGeometry, MeshLineMaterial });
 
 const GLTF_PATH = "/assets/kartu.glb";
-const BAND_TEXTURE_PATH = "/assets/bandd.png?v=4";
-const CARD_TEXTURE_PATH = "/assets/card-texture.png?v=4";
+const BAND_TEXTURE_PATH = "/assets/bandd.webp?v=4";
+const CARD_TEXTURE_PATH = "/assets/card-texture.webp?v=4";
 
 type BandProps = {
   maxSpeed?: number;
@@ -45,6 +46,22 @@ type RigidBodyWithLerped = RapierRigidBody & {
 
 function isFiniteVec3(v: THREE.Vector3) {
   return Number.isFinite(v.x) && Number.isFinite(v.y) && Number.isFinite(v.z);
+}
+
+/**
+ * MeshLine treats Vector3 points as numbers when its `three` copy fails
+ * `instanceof`, which writes NaN into the position buffer and makes
+ * computeBoundingSphere warn. Pass a flat numeric list, and skip non-finite points.
+ */
+function setRopePoints(geometry: MeshLineGeometry, points: THREE.Vector3[]) {
+  if (points.length < 2 || !points.every(isFiniteVec3)) return;
+  const flat: number[] = [];
+  for (const point of points) flat.push(point.x, point.y, point.z);
+  geometry.setPoints(flat);
+  const radius = geometry.boundingSphere?.radius;
+  if (!Number.isFinite(radius)) {
+    geometry.boundingSphere = new THREE.Sphere(points[0].clone(), 1);
+  }
 }
 
 function Band({
@@ -67,7 +84,13 @@ function Band({
   const dir = useMemo(() => new THREE.Vector3(), []);
   const tmp = useMemo(() => new THREE.Vector3(), []);
 
-  const bandGeometry = useMemo(() => new MeshLineGeometry(), []);
+  const bandGeometry = useMemo(() => {
+    const geometry = new MeshLineGeometry();
+    // Finite strap before physics translations exist, so the first frames
+    // never start from an empty or NaN rope.
+    geometry.setPoints([3.5, 4, 0, 3, 4, 0, 2.5, 4, 0, 1.5, 4, 0]);
+    return geometry;
+  }, []);
 
   const segmentProps = {
     type: "dynamic" as const,
@@ -126,14 +149,14 @@ function Band({
       const origin = isMobile
         ? new THREE.Vector3(0, 3.25, 0)
         : new THREE.Vector3(1.5, 4, 0);
-      bandGeometry.setPoints([
+      setRopePoints(bandGeometry, [
         origin.clone().add(new THREE.Vector3(0, -3, 0)),
         origin.clone().add(new THREE.Vector3(0, -2, 0)),
         origin.clone().add(new THREE.Vector3(0, -1, 0)),
         origin.clone(),
       ]);
     } else {
-      bandGeometry.setPoints([
+      setRopePoints(bandGeometry, [
         new THREE.Vector3(3.5, 4, 0),
         new THREE.Vector3(3.0, 4, 0),
         new THREE.Vector3(2.5, 4, 0),
@@ -219,7 +242,7 @@ function Band({
     curve.points[3].set(d.x, d.y, d.z);
 
     if (curve.points.every(isFiniteVec3)) {
-      bandGeometry.setPoints(curve.getPoints(32));
+      setRopePoints(bandGeometry, curve.getPoints(32));
     }
 
     ang.copy(card.current.angvel());
@@ -453,10 +476,29 @@ function StaticCardPaint({ enabled }: { enabled: boolean }) {
 export default function LanyardCard() {
   const isMobile = useMediaQuery("(max-width: 768px)");
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const tabVisible = useDocumentVisible();
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [onScreen, setOnScreen] = useState(false);
+
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setOnScreen(entry.isIntersecting && entry.intersectionRatio > 0);
+      },
+      { threshold: [0, 0.01] },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const frameloop = !onScreen || !tabVisible ? "never" : reduceMotion ? "demand" : "always";
 
   return (
     <div className="lanyard-card relative flex w-full max-w-[100vw] flex-col items-center overflow-hidden bg-transparent">
       <div
+        ref={stageRef}
         className={`lanyard-card__stage ${DESKTOP_STAGE} max-md:h-[min(80dvh,34rem)] max-md:min-h-[min(500px,80dvh)] max-md:max-w-[100vw] max-md:overflow-hidden`}
       >
         <WebGLErrorBoundary fallback={<CardFallback />}>
@@ -497,8 +539,8 @@ export default function LanyardCard() {
               touchAction: "pan-y",
               display: "block",
             }}
-            dpr={isMobile ? [1, 1.25] : [1, 1.5]}
-            frameloop={reduceMotion ? "demand" : "always"}
+            dpr={[1, 1.5]}
+            frameloop={frameloop}
             resize={{ scroll: false, debounce: { scroll: 0, resize: 0 } }}
           >
             <ResponsiveCardCamera isMobile={isMobile} />

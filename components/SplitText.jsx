@@ -21,6 +21,7 @@ const SplitText = ({
   rootMargin = '-100px',
   textAlign = 'center',
   tag = 'p',
+  ariaHidden = false,
   onLetterAnimationComplete
 }) => {
   const ref = useRef(null);
@@ -165,7 +166,12 @@ const SplitText = ({
     const Tag = tag || 'p';
 
     return (
-      <Tag ref={ref} style={style} className={classes}>
+      <Tag
+        ref={ref}
+        style={style}
+        className={classes}
+        aria-hidden={ariaHidden ? 'true' : undefined}
+      >
         {text}
       </Tag>
     );
