@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useEffect, useLayoutEffect, useRef, type RefObject } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useRef, type RefObject } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { EffectComposer, SelectiveBloom } from "@react-three/postprocessing";
 import { BlendFunction } from "postprocessing";
@@ -67,14 +67,19 @@ function cornerAbsNdc(object: THREE.Object3D, camera: THREE.Camera) {
 function FittedRoom({ screensRef }: { screensRef: RefObject<THREE.Mesh | null> }) {
   const outer = useRef<THREE.Group>(null);
   const inner = useRef<THREE.Group>(null);
+  const fittedKey = useRef("");
   const camera = useThree((state) => state.camera);
   const size = useThree((state) => state.size);
   const invalidate = useThree((state) => state.invalidate);
 
-  useLayoutEffect(() => {
+  useFrame(() => {
     const outerGroup = outer.current;
     const innerGroup = inner.current;
-    if (!outerGroup || !innerGroup || size.width < 2 || size.height < 2) return;
+    const persp = camera as THREE.PerspectiveCamera;
+    if (!outerGroup || !innerGroup || size.width < 2 || size.height < 2 || persp.aspect < 0.05) return;
+
+    const key = `${size.width.toFixed(1)}x${size.height.toFixed(1)}x${persp.aspect.toFixed(4)}`;
+    if (fittedKey.current === key) return;
 
     const center = new THREE.Vector3();
     const place = (scale: number) => {
@@ -91,9 +96,10 @@ function FittedRoom({ screensRef }: { screensRef: RefObject<THREE.Mesh | null> }
     };
 
     place(DESKTOP_SCALE);
-    camera.position.copy(DESKTOP_CAMERA).sub(center);
-    camera.lookAt(0, 0, 0);
-    camera.updateProjectionMatrix();
+    persp.position.copy(DESKTOP_CAMERA).sub(center);
+    persp.lookAt(0, 0, 0);
+    persp.updateWorldMatrix(true, false);
+    persp.updateProjectionMatrix();
 
     let low = 0.05;
     let high = 1.8;
@@ -101,7 +107,7 @@ function FittedRoom({ screensRef }: { screensRef: RefObject<THREE.Mesh | null> }
     for (let i = 0; i < 16; i += 1) {
       const mid = (low + high) / 2;
       place(mid);
-      if (cornerAbsNdc(outerGroup, camera) <= FIT_NDC) {
+      if (cornerAbsNdc(outerGroup, persp) <= FIT_NDC) {
         best = mid;
         low = mid;
       } else {
@@ -109,8 +115,10 @@ function FittedRoom({ screensRef }: { screensRef: RefObject<THREE.Mesh | null> }
       }
     }
     place(best);
+    persp.updateWorldMatrix(true, false);
+    fittedKey.current = key;
     invalidate();
-  }, [camera, invalidate, size.height, size.width]);
+  });
 
   return (
     <group ref={outer}>
