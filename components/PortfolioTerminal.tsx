@@ -12,7 +12,7 @@ type HistoryEntry =
   | { kind: "command"; text: string }
   | { kind: "output"; lines: TerminalLine[] };
 
-const CHAR_MS = 9;
+const CHAR_MS = 24;
 const AFTER_COMMAND_MS = 60;
 const AFTER_OUTPUT_MS = 90;
 const LINE_STAGGER_MS = 4;
