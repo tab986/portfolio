@@ -480,14 +480,21 @@ export default function LanyardCard() {
   const stageRef = useRef<HTMLDivElement>(null);
   const [onScreen, setOnScreen] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = stageRef.current;
     if (!el) return;
+
+    const inView = () => {
+      const rect = el.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight;
+    };
+
+    setOnScreen(inView());
     const observer = new IntersectionObserver(
       ([entry]) => {
         setOnScreen(entry.isIntersecting && entry.intersectionRatio > 0);
       },
-      { threshold: [0, 0.01] },
+      { threshold: [0, 0.01, 0.2] },
     );
     observer.observe(el);
     return () => observer.disconnect();

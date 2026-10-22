@@ -29,7 +29,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="hidden w-full min-w-0 flex-col items-center justify-center lg:order-none lg:col-span-7 lg:flex lg:items-end xl:col-span-8">
+          <div className="hidden w-full min-w-0 flex-col items-center justify-center lg:order-none lg:col-span-7 lg:flex lg:items-end lg:justify-start lg:self-start xl:col-span-8">
             <div className="mx-auto w-full max-w-[100vw] overflow-hidden lg:mx-0 lg:max-w-[760px] lg:-mr-2 lg:overflow-visible xl:-mr-6">
               <LanyardCardClient />
             </div>
