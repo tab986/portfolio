@@ -165,26 +165,16 @@ svg {
   background: transparent !important;
 }
 
-/* Phones and tablets: the welcome room fades into the page instead of ending in a canvas rectangle. */
-@media (max-width: 768px) {
+/* The welcome room is the model's own box. No mask, fade, or canvas frame. */
+@media (max-width: 1023px) {
   .welcome-room-stage,
   .welcome-room-stage canvas {
     background: transparent !important;
     border: 0 !important;
     box-shadow: none !important;
     outline: none;
-  }
-
-  .welcome-room-stage {
-    /* Generous rounded rectangle, feathered so the curve has no hard edge. */
-    -webkit-mask-image: url("/hero-3d/room-mask.svg");
-    mask-image: url("/hero-3d/room-mask.svg");
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    mask-position: center;
-    -webkit-mask-size: 100% 100%;
-    mask-size: 100% 100%;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 }
 
