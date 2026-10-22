@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import TerminalSummary from "@/components/TerminalSummary";
 import {
   PROMPT,
   TERMINAL_SEQUENCE,
@@ -11,10 +12,17 @@ type HistoryEntry =
   | { kind: "command"; text: string }
   | { kind: "output"; lines: TerminalLine[] };
 
-const CHAR_MS = 28;
-const AFTER_COMMAND_MS = 220;
-const AFTER_OUTPUT_MS = 420;
-const LINE_STAGGER_MS = 18;
+const CHAR_MS = 9;
+const AFTER_COMMAND_MS = 60;
+const AFTER_OUTPUT_MS = 90;
+const LINE_STAGGER_MS = 4;
+
+function fullHistory(): HistoryEntry[] {
+  return TERMINAL_SEQUENCE.flatMap((block) => [
+    { kind: "command" as const, text: block.command },
+    { kind: "output" as const, lines: block.lines },
+  ]);
+}
 
 function sleep(ms: number, signal?: AbortSignal) {
   return new Promise<void>((resolve, reject) => {
@@ -115,6 +123,13 @@ export default function PortfolioTerminal() {
     const { signal } = controller;
 
     let cancelled = false;
+    const showAll = () => {
+      setHistory(fullHistory());
+      setTypedCommand("");
+      setShowPrompt(true);
+      setPlaying(false);
+      setDone(true);
+    };
 
     async function runSequence() {
       setHistory([]);
@@ -128,21 +143,12 @@ export default function PortfolioTerminal() {
       ).matches;
 
       if (reduceMotion) {
-        setHistory(
-          TERMINAL_SEQUENCE.flatMap((block) => [
-            { kind: "command" as const, text: block.command },
-            { kind: "output" as const, lines: block.lines },
-          ]),
-        );
-        setTypedCommand("");
-        setShowPrompt(true);
-        setPlaying(false);
-        setDone(true);
+        showAll();
         return;
       }
 
       try {
-        await sleep(400, signal);
+        await sleep(80, signal);
 
         for (const block of TERMINAL_SEQUENCE) {
           if (cancelled) return;
@@ -216,20 +222,35 @@ export default function PortfolioTerminal() {
     setReplayKey((k) => k + 1);
   };
 
+  const handleSkip = () => {
+    if (done) return;
+    startedRef.current = true;
+    abortRef.current?.abort();
+    setHistory(fullHistory());
+    setTypedCommand("");
+    setShowPrompt(true);
+    setPlaying(false);
+    setDone(true);
+  };
+
   return (
     <section
       ref={sectionRef}
       id="terminal"
       aria-label="Portfolio terminal"
-      className="relative z-10 flex min-h-svh w-full max-w-[100vw] items-center justify-center overflow-x-hidden px-4 py-8 sm:px-8 sm:py-10 lg:px-8 xl:px-12"
+      className="relative z-10 flex min-h-svh w-full max-w-[100vw] items-start justify-center overflow-x-hidden px-4 py-8 sm:px-8 sm:py-10 lg:items-center lg:px-8 xl:px-12"
       style={{
         paddingBottom: "max(2rem, env(safe-area-inset-bottom))",
         paddingTop: "max(2rem, env(safe-area-inset-top))",
       }}
     >
-      <div className="w-full min-w-0 max-w-4xl">
+      <div className="grid w-full min-w-0 max-w-[90rem] grid-cols-1 items-start gap-5 lg:grid-cols-12 lg:items-center lg:gap-8">
+        <div className="min-w-0 lg:col-span-4">
+          <TerminalSummary />
+        </div>
+        <div className="min-w-0 lg:col-span-8">
         <div className="overflow-hidden rounded-lg border border-[var(--surface-border)] bg-[#0d0d0d] shadow-[0_0_0_1px_rgba(212,175,55,0.08),0_24px_80px_rgba(0,0,0,0.55)]">
-          <div className="flex items-center gap-2 border-b border-[var(--surface-border)] bg-[#161616] px-3 py-2 sm:gap-3 sm:px-4 sm:py-2.5">
+          <div className="flex flex-wrap items-center gap-2 border-b border-[var(--surface-border)] bg-[#161616] px-3 py-2 sm:gap-3 sm:px-4 sm:py-2.5">
             <div className="flex shrink-0 gap-1.5" aria-hidden>
               <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f56]" />
               <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e]" />
@@ -238,6 +259,14 @@ export default function PortfolioTerminal() {
             <p className="min-w-0 flex-1 truncate font-mono text-[10px] text-chrome-dim sm:text-[11px] sm:text-xs">
               abdalrhmn@portfolio-cli:~ — bash
             </p>
+            <button
+              type="button"
+              onClick={handleSkip}
+              disabled={done}
+              className="tap-target shrink-0 rounded-sm border border-gold/55 px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-gold transition-colors hover:border-gold hover:bg-gold/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Skip
+            </button>
             <button
               type="button"
               onClick={handleReplay}
@@ -292,6 +321,7 @@ export default function PortfolioTerminal() {
         <p className="mt-4 px-2 text-center font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-chrome-dim sm:tracking-[0.22em]">
           Scroll for ID card &amp; projects
         </p>
+        </div>
       </div>
     </section>
   );
