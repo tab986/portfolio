@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { FileDown } from "lucide-react";
 import HeroExperienceClient from "@/components/hero-3d/HeroExperienceClient";
 import { useMediaQuery } from "@/components/hero-3d/useMediaQuery";
+import ContactLinks from "@/components/ContactLinks";
 import { CONTACT_EMAIL, CV_FILENAME, CV_HREF } from "@/lib/site";
 
 const HERO_TITLE = "welcome to Abdalrhmn portfolio";
@@ -37,14 +38,14 @@ export default function WelcomeIntro() {
     <section
       id="welcome"
       aria-label="Welcome"
-      className="relative z-10 flex h-svh min-h-[100dvh] w-full max-w-[100vw] flex-col overflow-hidden"
+      className="relative z-10 flex w-full max-w-[100vw] flex-col overflow-hidden lg:h-svh lg:min-h-[100dvh]"
     >
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_85%_65%_at_72%_42%,rgba(54,54,54,0.55),transparent_68%),radial-gradient(ellipse_55%_45%_at_18%_78%,rgba(212,175,55,0.05),transparent_62%),#1a1a1a]"
       />
 
-      <div className="relative mx-auto grid h-full w-full max-w-[90rem] flex-1 grid-cols-1 content-start items-stretch gap-2 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:gap-4 sm:px-8 max-lg:grid-rows-[auto_minmax(0,1fr)] max-lg:content-stretch lg:grid-cols-12 lg:grid-rows-none lg:content-stretch lg:gap-6 lg:px-8 lg:pb-8 lg:pt-0 xl:gap-8 xl:px-12">
+      <div className="relative mx-auto grid h-full w-full max-w-[90rem] flex-1 grid-cols-1 content-start items-stretch gap-2 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-[max(1.25rem,env(safe-area-inset-top))] sm:gap-4 sm:px-8 lg:grid-cols-12 lg:grid-rows-none lg:content-stretch lg:gap-6 lg:px-8 lg:pb-8 lg:pt-0 xl:gap-8 xl:px-12">
         <div className="relative z-20 flex shrink-0 flex-col justify-center pt-2 lg:col-span-4 lg:pt-0 xl:col-span-4">
           <div className="max-w-md lg:max-w-none">
             <h1 className={`${headlineClassName} relative`} style={{ textAlign: "left" }}>
@@ -71,7 +72,7 @@ export default function WelcomeIntro() {
               )}
             </h1>
             <p className="mt-3 max-w-sm font-sans text-[0.9375rem] leading-relaxed text-chrome sm:mt-6 sm:text-sm md:text-base">
-              Flutter and full-stack developer building POS and mobile apps.
+              Full-Stack Developer building and shipping production web and mobile applications.
             </p>
             <div className="mt-4 flex flex-wrap gap-2 sm:mt-5">
               <a
@@ -91,12 +92,13 @@ export default function WelcomeIntro() {
                 Download CV
               </a>
             </div>
+            <ContactLinks className="mt-3" />
           </div>
         </div>
 
         <figure
           aria-label="3D workspace"
-          className="relative min-h-0 w-full min-w-0 cursor-grab active:cursor-grabbing max-lg:h-full lg:col-span-8 lg:h-auto lg:min-h-0 xl:col-span-8"
+          className="relative min-h-0 w-full min-w-0 max-lg:mx-auto max-lg:aspect-[5/4] max-lg:max-w-xl lg:col-span-8 lg:cursor-grab lg:active:cursor-grabbing lg:h-auto lg:min-h-0 xl:col-span-8"
         >
           <div className="welcome-room-stage absolute inset-0 overflow-hidden bg-transparent shadow-none lg:inset-y-0 lg:-right-8 lg:left-0 xl:-right-12">
             <HeroExperienceClient />

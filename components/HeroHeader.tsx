@@ -1,5 +1,7 @@
+import Image from "next/image";
 import { FileDown } from "lucide-react";
-import { CV_FILENAME, CV_HREF } from "@/lib/site";
+import ContactLinks from "@/components/ContactLinks";
+import { CV_FILENAME, CV_HREF, TELEGRAM_HANDLE, TELEGRAM_HREF } from "@/lib/site";
 
 export default function HeroHeader() {
   return (
@@ -11,21 +13,54 @@ export default function HeroHeader() {
       </p>
 
       <h2 className="animate-fade-up-delay-1 mt-4 break-words font-sans text-[clamp(1.55rem,7.2vw,3.35rem)] font-semibold leading-[1.12] tracking-tight text-warm-white sm:mt-6 sm:text-[clamp(1.9rem,4.4vw,3.35rem)] sm:leading-[1.08]">
-        Architecting Scalable Backend Systems &amp; Full-Stack Applications.
+        Building and shipping production web and mobile applications, end to end.
       </h2>
 
-      <p className="animate-fade-up-delay-1 mt-4 font-sans text-sm font-medium leading-relaxed tracking-wide text-chrome sm:mt-5 sm:text-[15px]">
+      <p className="animate-fade-up-delay-1 mt-4 hidden font-sans text-sm font-medium leading-relaxed tracking-wide text-chrome sm:mt-5 sm:text-[15px] lg:block">
         Abdalrhmn Anwar | Computer Engineering Technology (MTU)
       </p>
 
+      {/* Phones and tablets: a flat ID badge instead of the 3D lanyard card. */}
+      <div className="animate-fade-up-delay-1 mt-5 flex items-center gap-4 lg:hidden">
+        <div className="id-badge relative w-[5.25rem] shrink-0 pt-4 sm:w-24">
+          <span
+            aria-hidden
+            className="absolute left-1/2 top-0 h-6 w-2.5 -translate-x-1/2 rounded-sm bg-gradient-to-b from-zinc-700 to-zinc-900"
+          />
+          <span
+            aria-hidden
+            className="absolute left-1/2 top-3 z-10 h-3.5 w-5 -translate-x-1/2 rounded-[3px] border-2 border-zinc-400 bg-obsidian"
+          />
+          <Image
+            src="/assets/card-front.webp"
+            alt="Abdalrhmn Anwar"
+            width={320}
+            height={513}
+            unoptimized
+            className="relative block h-auto w-full rounded-md border-2 border-zinc-300/90 shadow-[0_12px_28px_rgba(0,0,0,0.55)]"
+          />
+        </div>
+        <div className="min-w-0">
+          <p className="font-sans text-base font-semibold leading-snug text-warm-white">
+            Abdalrhmn Anwar
+          </p>
+          <p className="mt-1 font-sans text-sm leading-relaxed text-chrome">
+            Computer Engineering Technology (MTU)
+          </p>
+          <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-chrome-dim">
+            Baghdad, Iraq
+          </p>
+        </div>
+      </div>
+
       <div className="animate-fade-up-delay-2 mt-6 flex w-full flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-stretch">
         <a
-          href="https://t.me/o_xdv"
+          href={TELEGRAM_HREF}
           target="_blank"
           rel="noopener noreferrer"
           className="tap-target glow-gold inline-flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 bg-gold px-5 py-3.5 text-center font-sans text-sm font-semibold text-obsidian transition-[box-shadow,transform] duration-300 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold sm:w-auto sm:justify-start"
         >
-          Telegram: @o_xdv
+          Telegram: {TELEGRAM_HANDLE}
         </a>
 
         <a
@@ -50,6 +85,8 @@ export default function HeroHeader() {
           </span>
         </a>
       </div>
+
+      <ContactLinks className="animate-fade-up-delay-2 mt-4" />
     </header>
   );
 }

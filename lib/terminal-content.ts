@@ -196,11 +196,64 @@ export const TERMINAL_SEQUENCE: TerminalBlock[] = [
         type: "text",
         text: "--------------------------------------------------",
       },
+      { type: "text", text: "PROJECT NAME : Coders Hub" },
+      { type: "text", text: "ROLE         : Full-Stack Developer" },
+      {
+        type: "text",
+        text: "DETAILS      : Software Studio Website & Billing Platform.",
+      },
+      {
+        type: "text",
+        text: "              Built the website of Coders Hub, a Baghdad-based software studio that",
+      },
+      {
+        type: "text",
+        text: "              designs and develops websites, mobile apps, and SaaS platforms, with",
+      },
+      {
+        type: "text",
+        text: "              clear service pricing and a showcase of shipped products.",
+      },
+      {
+        type: "text",
+        text: "              Built the billing platform with Next.js on Cloudflare Workers: online",
+      },
+      {
+        type: "text",
+        text: "              payments through the Wayl payment gateway with signed webhook",
+      },
+      {
+        type: "text",
+        text: "              verification, and automatic issuing of Ed25519-signed software licenses.",
+      },
+      {
+        type: "text",
+        text: "              PostgreSQL (Neon) database, secrets kept in environment configuration,",
+      },
+      {
+        type: "text",
+        text: "              HTTPS and Cloudflare edge protection on all routes.",
+      },
+      {
+        type: "link",
+        prefix: "LINK         : ",
+        label: "codershub.org",
+        href: "https://www.codershub.org",
+      },
+      { type: "blank" },
       { type: "text", text: "PROJECT NAME : TabibiQ" },
       { type: "text", text: "ROLE         : Full-Stack Developer" },
       {
         type: "text",
         text: "DETAILS      : Medical Appointment Booking Platform (Android & iOS).",
+      },
+      {
+        type: "text",
+        text: "              Built both the frontend and the backend, and owned the full system",
+      },
+      {
+        type: "text",
+        text: "              architecture and workflow end to end.",
       },
       {
         type: "text",
@@ -341,6 +394,12 @@ export const TERMINAL_SEQUENCE: TerminalBlock[] = [
         prefix: "  * Phone    : ",
         label: "+9647810952419",
         href: "tel:+9647810952419",
+      },
+      {
+        type: "link",
+        prefix: "  * Telegram : ",
+        label: "@o_xdv",
+        href: "https://t.me/o_xdv",
       },
       {
         type: "link",

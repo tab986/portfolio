@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import TerminalSummary from "@/components/TerminalSummary";
 import {
   PROMPT,
@@ -8,21 +8,14 @@ import {
   type TerminalLine,
 } from "@/lib/terminal-content";
 
-type HistoryEntry =
-  | { kind: "command"; text: string }
-  | { kind: "output"; lines: TerminalLine[] };
+const CHAR_MS = 32;
+const AFTER_COMMAND_MS = 180;
+const LINE_STAGGER_MS = 18;
 
-const CHAR_MS = 24;
-const AFTER_COMMAND_MS = 60;
-const AFTER_OUTPUT_MS = 90;
-const LINE_STAGGER_MS = 4;
+/** The command chips replace the `help` listing, so it is not a chip itself. */
+const COMMANDS = TERMINAL_SEQUENCE.filter((block) => block.command !== "help");
 
-function fullHistory(): HistoryEntry[] {
-  return TERMINAL_SEQUENCE.flatMap((block) => [
-    { kind: "command" as const, text: block.command },
-    { kind: "output" as const, lines: block.lines },
-  ]);
-}
+type Phase = "idle" | "typing" | "printing" | "done";
 
 function sleep(ms: number, signal?: AbortSignal) {
   return new Promise<void>((resolve, reject) => {
@@ -81,18 +74,59 @@ export default function PortfolioTerminal() {
   const abortRef = useRef<AbortController | null>(null);
   const startedRef = useRef(false);
 
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [active, setActive] = useState<number | null>(null);
   const [typedCommand, setTypedCommand] = useState("");
-  const [showPrompt, setShowPrompt] = useState(true);
-  const [playing, setPlaying] = useState(false);
-  const [done, setDone] = useState(false);
-  const [replayKey, setReplayKey] = useState(0);
+  const [lines, setLines] = useState<TerminalLine[]>([]);
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [visited, setVisited] = useState<number[]>([]);
 
-  useEffect(() => {
-    const el = scrollerRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
-  }, [history, typedCommand]);
+  // One command per run: the output replaces the previous one and the view
+  // stays at its first line, so the reader sets the pace.
+  const run = useCallback(async (index: number) => {
+    const block = COMMANDS[index];
+    if (!block) return;
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const { signal } = controller;
+
+    setActive(index);
+    setVisited((prev) => (prev.includes(index) ? prev : [...prev, index]));
+    setLines([]);
+    setTypedCommand("");
+    setPhase("typing");
+    if (scrollerRef.current) scrollerRef.current.scrollTop = 0;
+
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduceMotion) {
+      setTypedCommand(block.command);
+      setLines(block.lines);
+      setPhase("done");
+      return;
+    }
+
+    try {
+      await sleep(80, signal);
+      for (let i = 0; i < block.command.length; i += 1) {
+        setTypedCommand(block.command.slice(0, i + 1));
+        await sleep(CHAR_MS, signal);
+      }
+      await sleep(AFTER_COMMAND_MS, signal);
+
+      setPhase("printing");
+      for (let i = 1; i <= block.lines.length; i += 1) {
+        setLines(block.lines.slice(0, i));
+        await sleep(LINE_STAGGER_MS, signal);
+      }
+      setPhase("done");
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      throw err;
+    }
+  }, []);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -103,7 +137,7 @@ export default function PortfolioTerminal() {
         if (entry.isIntersecting && entry.intersectionRatio > 0.35) {
           if (!startedRef.current) {
             startedRef.current = true;
-            setReplayKey((k) => k + 1);
+            void run(0);
           }
         }
       },
@@ -112,125 +146,31 @@ export default function PortfolioTerminal() {
 
     observer.observe(section);
     return () => observer.disconnect();
-  }, []);
+  }, [run]);
 
-  useEffect(() => {
-    if (replayKey === 0) return;
+  useEffect(() => () => abortRef.current?.abort(), []);
 
-    abortRef.current?.abort();
-    const controller = new AbortController();
-    abortRef.current = controller;
-    const { signal } = controller;
+  const playing = phase === "typing" || phase === "printing";
+  const activeBlock = active === null ? null : COMMANDS[active];
+  const nextIndex =
+    phase === "done" ? COMMANDS.findIndex((_, i) => !visited.includes(i)) : -1;
 
-    let cancelled = false;
-    const showAll = () => {
-      setHistory(fullHistory());
-      setTypedCommand("");
-      setShowPrompt(true);
-      setPlaying(false);
-      setDone(true);
-    };
-
-    async function runSequence() {
-      setHistory([]);
-      setTypedCommand("");
-      setShowPrompt(true);
-      setPlaying(true);
-      setDone(false);
-
-      const reduceMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-
-      if (reduceMotion) {
-        showAll();
-        return;
-      }
-
-      try {
-        await sleep(80, signal);
-
-        for (const block of TERMINAL_SEQUENCE) {
-          if (cancelled) return;
-
-          setTypedCommand("");
-          setShowPrompt(true);
-
-          for (let i = 0; i < block.command.length; i += 1) {
-            if (cancelled) return;
-            setTypedCommand(block.command.slice(0, i + 1));
-            await sleep(CHAR_MS, signal);
-          }
-
-          await sleep(AFTER_COMMAND_MS, signal);
-          if (cancelled) return;
-
-          setHistory((prev) => [
-            ...prev,
-            { kind: "command", text: block.command },
-          ]);
-          setTypedCommand("");
-          setShowPrompt(false);
-
-          const revealed: TerminalLine[] = [];
-          for (const line of block.lines) {
-            if (cancelled) return;
-            revealed.push(line);
-            setHistory((prev) => {
-              const next = [...prev];
-              const last = next[next.length - 1];
-              if (last?.kind === "output") {
-                next[next.length - 1] = {
-                  kind: "output",
-                  lines: [...revealed],
-                };
-              } else {
-                next.push({ kind: "output", lines: [...revealed] });
-              }
-              return next;
-            });
-            await sleep(LINE_STAGGER_MS, signal);
-          }
-
-          setShowPrompt(true);
-          await sleep(AFTER_OUTPUT_MS, signal);
-        }
-
-        if (!cancelled) {
-          setDone(true);
-          setPlaying(false);
-          setShowPrompt(true);
-          setTypedCommand("");
-        }
-      } catch (err) {
-        if (err instanceof DOMException && err.name === "AbortError") return;
-        throw err;
-      }
-    }
-
-    void runSequence();
-
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, [replayKey]);
+  const handleChip = (index: number) => {
+    startedRef.current = true;
+    void run(index);
+  };
 
   const handleReplay = () => {
-    if (playing) return;
-    startedRef.current = true;
-    setReplayKey((k) => k + 1);
+    if (playing || active === null) return;
+    void run(active);
   };
 
   const handleSkip = () => {
-    if (done) return;
-    startedRef.current = true;
+    if (!playing || !activeBlock) return;
     abortRef.current?.abort();
-    setHistory(fullHistory());
-    setTypedCommand("");
-    setShowPrompt(true);
-    setPlaying(false);
-    setDone(true);
+    setTypedCommand(activeBlock.command);
+    setLines(activeBlock.lines);
+    setPhase("done");
   };
 
   return (
@@ -249,78 +189,118 @@ export default function PortfolioTerminal() {
           <TerminalSummary />
         </div>
         <div className="min-w-0 lg:col-span-8">
-        <div className="overflow-hidden rounded-lg border border-[var(--surface-border)] bg-[#0d0d0d] shadow-[0_0_0_1px_rgba(212,175,55,0.08),0_24px_80px_rgba(0,0,0,0.55)]">
-          <div className="flex flex-wrap items-center gap-2 border-b border-[var(--surface-border)] bg-[#161616] px-3 py-2 sm:gap-3 sm:px-4 sm:py-2.5">
-            <div className="flex shrink-0 gap-1.5" aria-hidden>
-              <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f56]" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e]" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f]" />
+          <div className="overflow-hidden rounded-lg border border-[var(--surface-border)] bg-[#0d0d0d] shadow-[0_0_0_1px_rgba(212,175,55,0.08),0_24px_80px_rgba(0,0,0,0.55)]">
+            <div className="flex flex-wrap items-center gap-2 border-b border-[var(--surface-border)] bg-[#161616] px-3 py-2 sm:gap-3 sm:px-4 sm:py-2.5">
+              <div className="flex shrink-0 gap-1.5" aria-hidden>
+                <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f56]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f]" />
+              </div>
+              <p className="min-w-0 flex-1 truncate font-mono text-[10px] text-chrome-dim sm:text-[11px] sm:text-xs">
+                abdalrhmn@portfolio-cli:~ — bash
+              </p>
+              <button
+                type="button"
+                onClick={handleSkip}
+                disabled={!playing}
+                className="tap-target shrink-0 rounded-sm border border-gold/55 px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-gold transition-colors hover:border-gold hover:bg-gold/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Skip
+              </button>
+              <button
+                type="button"
+                onClick={handleReplay}
+                disabled={playing || active === null}
+                className="tap-target shrink-0 rounded-sm px-2 font-mono text-[10px] uppercase tracking-[0.18em] text-chrome transition-colors hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold disabled:cursor-not-allowed disabled:opacity-40 sm:px-3"
+              >
+                Replay
+              </button>
             </div>
-            <p className="min-w-0 flex-1 truncate font-mono text-[10px] text-chrome-dim sm:text-[11px] sm:text-xs">
-              abdalrhmn@portfolio-cli:~ — bash
-            </p>
-            <button
-              type="button"
-              onClick={handleSkip}
-              disabled={done}
-              className="tap-target shrink-0 rounded-sm border border-gold/55 px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-gold transition-colors hover:border-gold hover:bg-gold/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Skip
-            </button>
-            <button
-              type="button"
-              onClick={handleReplay}
-              disabled={playing || !done}
-              className="tap-target shrink-0 rounded-sm px-2 font-mono text-[10px] uppercase tracking-[0.18em] text-chrome transition-colors hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold disabled:cursor-not-allowed disabled:opacity-40 sm:px-3"
-            >
-              Replay
-            </button>
-          </div>
 
-          <div
-            ref={scrollerRef}
-            data-terminal-scroll
-            className="max-h-[min(62svh,32rem)] overflow-x-auto overflow-y-auto overscroll-contain px-3 py-3 font-mono text-[11px] leading-relaxed sm:max-h-[min(70svh,36rem)] sm:px-5 sm:py-4 sm:text-[13px]"
-            role="log"
-            aria-live="polite"
-            aria-relevant="additions"
-          >
-            <p className="mb-3 text-chrome-dim">
-              # Portfolio shell — auto-playing command tour
-            </p>
-
-            {history.map((entry, idx) => {
-              if (entry.kind === "command") {
+            <div
+              role="toolbar"
+              aria-label="Terminal commands"
+              className="flex flex-wrap gap-1.5 border-b border-[var(--surface-border)] bg-[#121212] px-3 py-2 sm:px-4"
+            >
+              {COMMANDS.map((block, i) => {
+                const isActive = i === active;
+                const isNext = i === nextIndex;
+                const seen = visited.includes(i);
+                const tone = isActive
+                  ? "border-gold bg-gold text-obsidian"
+                  : isNext
+                    ? "border-gold/70 text-gold hover:bg-gold/10"
+                    : seen
+                      ? "border-zinc-700/70 text-chrome-dim hover:border-gold/50 hover:text-gold"
+                      : "border-zinc-600/80 text-zinc-200 hover:border-gold/50 hover:text-gold";
                 return (
-                  <div key={`cmd-${idx}`} className="mt-1 break-words">
-                    <span className="text-gold">{PROMPT}</span>{" "}
-                    <span className="text-warm-white">{entry.text}</span>
-                  </div>
+                  <button
+                    key={block.command}
+                    type="button"
+                    onClick={() => handleChip(i)}
+                    aria-pressed={isActive}
+                    className={`tap-target inline-flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1.5 font-mono text-[11px] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold sm:text-xs ${tone}`}
+                  >
+                    <span aria-hidden className={isActive ? "opacity-60" : "text-chrome-dim"}>
+                      {seen && !isActive ? "✓" : "$"}
+                    </span>
+                    {block.command}
+                  </button>
                 );
-              }
-              return (
-                <div key={`out-${idx}`} className="mt-0.5 min-w-0">
-                  <OutputLines lines={entry.lines} />
-                </div>
-              );
-            })}
+              })}
+            </div>
 
-            {showPrompt ? (
+            <div
+              ref={scrollerRef}
+              data-terminal-scroll
+              className="h-[min(48svh,26rem)] overflow-x-auto overflow-y-auto overscroll-contain px-3 py-3 font-mono text-xs leading-relaxed sm:h-[min(56svh,32rem)] sm:px-5 sm:py-4 sm:text-[13px]"
+              role="log"
+              aria-live="polite"
+              aria-relevant="additions"
+            >
+              <p className="mb-3 text-chrome-dim">
+                # Portfolio shell — pick a command above to run it
+              </p>
+
               <div className="mt-1 flex flex-wrap items-baseline break-all">
                 <span className="text-gold">{PROMPT}</span>
                 <span className="ml-2 text-warm-white">{typedCommand}</span>
-                <span
-                  aria-hidden
-                  className="ml-0.5 inline-block h-[1.05em] w-[0.55ch] translate-y-[0.1em] animate-pulse bg-gold"
-                />
+                {phase === "idle" || phase === "typing" ? (
+                  <span
+                    aria-hidden
+                    className="ml-0.5 inline-block h-[1.05em] w-[0.55ch] translate-y-[0.1em] animate-pulse bg-gold"
+                  />
+                ) : null}
               </div>
-            ) : null}
-          </div>
-        </div>
 
-        <p className="mt-4 px-2 text-center font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-chrome-dim sm:tracking-[0.22em]">
-          Scroll for ID card &amp; projects
-        </p>
+              <div className="mt-0.5 min-w-0">
+                <OutputLines lines={lines} />
+              </div>
+
+              {phase === "done" ? (
+                <div className="mt-1 flex flex-wrap items-baseline gap-x-2 break-all">
+                  <span className="text-gold">{PROMPT}</span>
+                  <span
+                    aria-hidden
+                    className="inline-block h-[1.05em] w-[0.55ch] translate-y-[0.1em] animate-pulse bg-gold"
+                  />
+                  {nextIndex >= 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => handleChip(nextIndex)}
+                      className="tap-target inline-flex items-center rounded-sm px-1 text-chrome underline-offset-2 transition-colors hover:text-gold hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+                    >
+                      next: {COMMANDS[nextIndex].command} →
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          <p className="mt-4 px-2 text-center font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-chrome-dim sm:tracking-[0.22em]">
+            Scroll for projects
+          </p>
         </div>
       </div>
     </section>
