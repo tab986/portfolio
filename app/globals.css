@@ -191,9 +191,9 @@ svg {
     position: relative !important;
     width: 100% !important;
     max-width: 100vw !important;
-    /* 80dvh for short phones, capped so the badge stays above the fold */
-    height: min(80dvh, 34rem) !important;
-    min-height: min(500px, 80dvh) !important;
+    /* Compact stage: the badge fills it and the projects follow right after */
+    height: min(60dvh, 26rem) !important;
+    min-height: 20rem !important;
     margin-inline: auto !important;
     overflow: hidden !important;
     touch-action: pan-y;

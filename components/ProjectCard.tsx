@@ -51,6 +51,7 @@ const PROJECTS: Project[] = [
     stack: ["Flutter", "Ed25519", "Wayl", "Next.js", "PostgreSQL", "Cloudflare Workers"],
     icon: Store,
     tone: "from-[#3a3424] to-[#1a1a1a]",
+    href: "https://www.codershub.org/teryaq",
   },
   {
     name: "Hala Teacher",
@@ -85,7 +86,7 @@ function ProjectVisual({ project }: { project: Project }) {
   return (
     <div
       aria-hidden
-      className={`relative flex h-24 items-center justify-center bg-gradient-to-br ${project.tone}`}
+      className={`relative hidden h-24 items-center justify-center bg-gradient-to-br lg:flex ${project.tone}`}
     >
       <span className="grid h-12 w-12 place-items-center rounded-xl border border-white/10 bg-black/25 text-gold">
         <Icon className="h-6 w-6" />
@@ -95,17 +96,29 @@ function ProjectVisual({ project }: { project: Project }) {
 }
 
 function ProjectBody({ project }: { project: Project }) {
+  const Icon = project.icon;
   return (
     <>
       <ProjectVisual project={project} />
       <div className="p-4 sm:p-5">
-        <p className="font-sans text-[10px] font-medium uppercase tracking-[0.2em] text-chrome">
-          {project.role}
-        </p>
-        <h3 className="mt-2 break-words font-sans text-xl font-semibold tracking-tight text-warm-white transition-colors group-hover:text-gold sm:text-2xl">
-          {project.name}
-        </h3>
-        <p className="mt-2 font-sans text-sm leading-relaxed text-chrome">
+        <div className="flex items-center gap-3">
+          {/* Phones: icon chip beside the title instead of a full-width banner */}
+          <span
+            aria-hidden
+            className={`grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-white/10 bg-gradient-to-br text-gold lg:hidden ${project.tone}`}
+          >
+            <Icon className="h-5 w-5" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-sans text-[10px] font-medium uppercase tracking-[0.2em] text-chrome">
+              {project.role}
+            </p>
+            <h3 className="mt-1 break-words font-sans text-xl font-semibold tracking-tight text-warm-white transition-colors group-hover:text-gold sm:text-2xl lg:mt-2">
+              {project.name}
+            </h3>
+          </div>
+        </div>
+        <p className="mt-3 font-sans text-sm leading-relaxed text-chrome lg:mt-2">
           {project.summary}
         </p>
         {project.stack.length > 0 ? (
@@ -170,8 +183,8 @@ function ProjectEntry({ project }: { project: Project }) {
 
 export default function ProjectCard() {
   return (
-    <div className="flex w-full flex-col gap-3">
-      <h2 className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-chrome">
+    <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
+      <h2 className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-chrome sm:col-span-2 lg:col-span-1">
         Projects
       </h2>
       {PROJECTS.map((project) => (

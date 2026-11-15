@@ -269,6 +269,12 @@ export const TERMINAL_SEQUENCE: TerminalBlock[] = [
         type: "text",
         text: "              Cloudflare Workers and a PostgreSQL (Neon) database.",
       },
+      {
+        type: "link",
+        prefix: "LINK         : ",
+        label: "codershub.org/teryaq",
+        href: "https://www.codershub.org/teryaq",
+      },
       { type: "blank" },
       { type: "text", text: "PROJECT NAME : Hala Teacher" },
       { type: "text", text: "ROLE         : Front-End Developer" },

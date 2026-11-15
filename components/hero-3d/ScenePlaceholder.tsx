@@ -1,6 +1,6 @@
-/** Desktop lanyard stage size. Matches the mounted card so the column does not jump. */
+/** Lanyard stage size (compact on phones). Matches the mounted card so the column does not jump. */
 export const cardStageClassName =
-  "relative h-[min(82vh,700px)] w-full lg:h-[min(78vh,660px)] lg:min-h-[560px]";
+  "relative h-[min(82vh,700px)] w-full max-md:h-[min(60dvh,26rem)] max-md:min-h-[20rem] lg:h-[min(78vh,660px)] lg:min-h-[560px]";
 
 export function RoomPlaceholder() {
   return (

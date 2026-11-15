@@ -263,7 +263,7 @@ function Band({
   });
 
   const hangOrigin = isMobile ? ([0, 3.25, 0] as const) : ([1.5, 4, 0] as const);
-  const lineWidth = isMobile ? 0.45 : 1;
+  const lineWidth = isMobile ? 0.7 : 1;
   const rest = reduceMotion
     ? {
         j1: [0, -1, 0] as const,
@@ -391,11 +391,14 @@ const DESKTOP_CAMERA = {
   fov: 24,
 };
 
-/** Mobile: pulled back + lookAt mid-card so strap + badge fit inside stage. */
+/**
+ * Mobile: close, level framing. The badge fills about half the stage and the
+ * strap runs off the top edge instead of hanging from a visible point.
+ */
 const MOBILE_CAMERA = {
-  position: [0, 0.05, 14.75] as [number, number, number],
-  fov: 34,
-  lookAt: [0, -0.45, 0] as [number, number, number],
+  position: [0, -1.4, 9.5] as [number, number, number],
+  fov: 26,
+  lookAt: [0, -1.4, 0] as [number, number, number],
 };
 
 /**
@@ -449,7 +452,7 @@ function ResponsiveCardCamera({ isMobile }: { isMobile: boolean }) {
 function CardFallback() {
   return (
     <div
-      className={`flex items-center justify-center overflow-hidden max-md:h-[min(80dvh,34rem)] max-md:min-h-[min(500px,80dvh)] max-md:max-w-[100vw] ${DESKTOP_STAGE}`}
+      className={`flex items-center justify-center overflow-hidden max-md:h-[min(60dvh,26rem)] max-md:min-h-[20rem] max-md:max-w-[100vw] ${DESKTOP_STAGE}`}
     >
       <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-chrome-dim">
         3D card unavailable
@@ -506,7 +509,7 @@ export default function LanyardCard() {
     <div className="lanyard-card relative flex w-full max-w-[100vw] flex-col items-center overflow-hidden bg-transparent">
       <div
         ref={stageRef}
-        className={`lanyard-card__stage ${DESKTOP_STAGE} max-md:h-[min(80dvh,34rem)] max-md:min-h-[min(500px,80dvh)] max-md:max-w-[100vw] max-md:overflow-hidden`}
+        className={`lanyard-card__stage ${DESKTOP_STAGE} max-md:h-[min(60dvh,26rem)] max-md:min-h-[20rem] max-md:max-w-[100vw] max-md:overflow-hidden`}
       >
         <WebGLErrorBoundary fallback={<CardFallback />}>
           <Canvas
