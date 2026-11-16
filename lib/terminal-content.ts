@@ -407,6 +407,12 @@ export const TERMINAL_SEQUENCE: TerminalBlock[] = [
         label: "linkedin.com/in/abdalrhmn-anwar-764679279",
         href: "https://linkedin.com/in/abdalrhmn-anwar-764679279",
       },
+      {
+        type: "link",
+        prefix: "  * GitHub   : ",
+        label: "github.com/tab986",
+        href: "https://github.com/tab986",
+      },
       { type: "blank" },
     ],
   },

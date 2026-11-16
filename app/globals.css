@@ -65,10 +65,10 @@
   --color-node: var(--node);
   --color-chrome: var(--chrome);
   --color-chrome-dim: var(--chrome-dim);
-  --font-sans: var(--font-plus-jakarta);
-  --font-serif: var(--font-plus-jakarta);
+  --font-sans: var(--font-plus-jakarta), var(--font-arabic);
+  --font-serif: var(--font-plus-jakarta), var(--font-arabic);
   --font-mono: var(--font-jetbrains-mono);
-  --font-heading: var(--font-plus-jakarta);
+  --font-heading: var(--font-plus-jakarta), var(--font-arabic);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -124,12 +124,30 @@ html {
 body {
   background: var(--obsidian);
   color: var(--warm-white);
-  font-family: var(--font-plus-jakarta), system-ui, sans-serif;
+  font-family: var(--font-plus-jakarta), var(--font-arabic), system-ui, sans-serif;
   min-height: 100%;
   overflow: visible;
   overscroll-behavior-y: none;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+}
+
+/* Arabic letters must stay joined: no tracking outside left-to-right islands. */
+html[lang="ar"] *:not([dir="ltr"]):not([dir="ltr"] *) {
+  letter-spacing: 0 !important;
+}
+
+/*
+ * The Arabic face has to come first: the Latin font's metric fallback is a
+ * local Arial alias, which has Arabic glyphs and would win otherwise.
+ */
+html[lang="ar"] body,
+html[lang="ar"] .font-sans {
+  font-family: var(--font-arabic), var(--font-plus-jakarta), system-ui, sans-serif;
+}
+
+html[lang="ar"] .font-mono:not([dir="ltr"]):not([dir="ltr"] *) {
+  font-family: var(--font-arabic), var(--font-jetbrains-mono), monospace;
 }
 
 img,

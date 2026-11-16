@@ -22,7 +22,8 @@ export default function LanyardCardClient() {
   }, []);
 
   useEffect(() => {
-    const portfolio = document.getElementById("portfolio");
+    // The card lives in the contact section; load its chunk only when that is near.
+    const portfolio = document.getElementById("contact");
     if (!portfolio) return;
     const observer = new IntersectionObserver(
       ([entry]) => {

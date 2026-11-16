@@ -1,59 +1,37 @@
 import AuroraClient from "@/components/AuroraClient";
-import { CV_FILENAME, CV_HREF } from "@/lib/site";
-import HeroHeader from "@/components/HeroHeader";
+import ContactSection from "@/components/ContactSection";
+import LanguageSync from "@/components/LanguageSync";
 import PageTeleportScroll from "@/components/PageTeleportScroll";
 import PortfolioTerminal from "@/components/PortfolioTerminal";
 import ProjectCard from "@/components/ProjectCard";
+import SiteFooter from "@/components/SiteFooter";
+import SiteNav from "@/components/SiteNav";
 import WelcomeIntro from "@/components/WelcomeIntro";
-import LanyardCardClient from "@/components/band/LanyardCardClient";
 
 export default function Home() {
   return (
     <main className="relative w-full max-w-[100vw] overflow-x-hidden bg-obsidian">
+      <LanguageSync />
       <AuroraClient />
       <PageTeleportScroll />
+      <SiteNav />
 
       <WelcomeIntro />
 
-      <PortfolioTerminal />
-
+      {/* Projects come straight after the intro: they are the strongest content. */}
       <section
         id="portfolio"
-        className="relative z-10 mx-auto flex min-h-svh w-full max-w-[90rem] flex-col overflow-x-hidden px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6 sm:px-8 sm:py-8 lg:px-8 lg:py-10 xl:px-12"
+        aria-labelledby="projects-heading"
+        className="relative z-10 mx-auto w-full max-w-[90rem] overflow-x-hidden px-4 pb-10 pt-20 sm:px-8 lg:min-h-svh lg:pb-14 lg:pt-24 xl:px-12"
       >
-        <div className="grid grid-cols-1 items-start gap-6 sm:gap-8 lg:grid-cols-12 lg:items-center lg:gap-8 xl:gap-10">
-          <div className="flex min-w-0 flex-col justify-center lg:col-span-5 lg:pr-4 xl:col-span-5">
-            <HeroHeader />
-          </div>
-
-          <div className="hidden w-full min-w-0 flex-col items-center justify-center lg:col-span-7 lg:flex lg:items-end lg:justify-start lg:self-start xl:col-span-7">
-            <div className="mx-auto w-full max-w-[100vw] overflow-hidden lg:mx-0 lg:max-w-[760px] lg:-mr-2 lg:overflow-visible xl:-mr-6">
-              <LanyardCardClient />
-            </div>
-          </div>
-        </div>
-
-        {/* Projects run the full width below the intro, as a grid on wide screens. */}
-        <div className="mt-8 flex-1 lg:mt-4">
-          <ProjectCard />
-        </div>
-
-        <footer className="relative z-10 order-4 mt-8 flex flex-col gap-4 border-t border-[var(--surface-border)] pt-5 font-sans text-[10px] font-medium uppercase tracking-[0.14em] text-chrome-dim sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-3 sm:tracking-[0.16em]">
-          <span>Abdalrhmn Anwar · Baghdad</span>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <a
-              href={CV_HREF}
-              download={CV_FILENAME}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="tap-target inline-flex min-h-11 cursor-pointer items-center text-chrome transition-colors duration-300 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
-            >
-              CV / Resume
-            </a>
-            <span className="text-chrome">Next.js · Node.js · PostgreSQL</span>
-          </div>
-        </footer>
+        <ProjectCard />
       </section>
+
+      <PortfolioTerminal />
+
+      <ContactSection />
+
+      <SiteFooter />
     </main>
   );
 }

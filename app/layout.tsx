@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import { IBM_Plex_Sans_Arabic, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { metadataBase, SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,14 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
   weight: ["400", "500"],
+});
+
+// Arabic glyphs only. Not preloaded: English visitors never download it.
+const plexArabic = IBM_Plex_Sans_Arabic({
+  variable: "--font-arabic",
+  subsets: ["arabic"],
+  weight: ["400", "500", "600", "700"],
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -64,6 +72,7 @@ export default function RootLayout({
         "h-full antialiased",
         plusJakarta.variable,
         jetbrainsMono.variable,
+        plexArabic.variable,
       )}
     >
       <body

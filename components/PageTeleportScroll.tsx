@@ -2,7 +2,8 @@
 
 import { useEffect } from "react";
 
-const SECTIONS = ["welcome", "terminal", "portfolio"] as const;
+/** Only the intro snaps to the projects; everything after scrolls natively. */
+const SECTIONS = ["welcome", "portfolio"] as const;
 type SectionId = (typeof SECTIONS)[number];
 
 const ARRIVE_PAD_PX = 80;
@@ -58,7 +59,7 @@ function hostCanScroll(host: HTMLElement, deltaY: number) {
 }
 
 /**
- * Desktop snap between welcome, terminal, and portfolio.
+ * Desktop snap between the welcome screen and the projects section.
  * Narrow screens and touch devices keep native scrolling. Section animations
  * still start from their own intersection observers.
  * While a snap is animating, wheel inertia is eaten; after it lands (or times

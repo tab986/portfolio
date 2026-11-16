@@ -1,37 +1,33 @@
-/** Facts taken from the CV. No year-count or project total is stated there. */
-const FACTS = [
-  {
-    label: "Work",
-    value: "Full-Stack Developer, Freelance / Projects · 2025–Present",
-  },
-  {
-    label: "Internship",
-    value: "Backend Intern, GDG · 05/2025–08/2025",
-  },
-  {
-    label: "Education",
-    value: "Computer Engineering Technology, MTU · 2023–2027",
-  },
-  {
-    label: "Shipping",
-    value: "Google Play and the App Store",
-  },
-] as const;
+"use client";
+
+import { useLang } from "@/lib/i18n";
 
 const STACK = ["Next.js", "Node.js", "Flutter", "PostgreSQL", "Cloudflare Workers"] as const;
 
+/** Facts taken from the CV. No year-count or project total is stated there. */
 export default function TerminalSummary() {
+  const { t } = useLang();
+
+  const facts = [
+    { label: t.about.work, value: t.about.workValue },
+    { label: t.about.internship, value: t.about.internshipValue },
+    { label: t.about.education, value: t.about.educationValue },
+    { label: t.about.shipping, value: t.about.shippingValue },
+  ];
+
   return (
-    <aside aria-label="Quick summary" className="glass-panel min-w-0 rounded-lg p-4 sm:p-5">
-      <p className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-gold">
-        At a glance
-      </p>
+    <aside aria-labelledby="about-heading" className="glass-panel min-w-0 rounded-lg p-4 sm:p-5">
+      <h2
+        id="about-heading"
+        className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-gold"
+      >
+        {t.about.label}
+      </h2>
       <p className="mt-3 font-sans text-[0.95rem] leading-relaxed text-warm-white sm:text-base">
-        Full-Stack Developer in Baghdad, shipping production web and mobile apps from database
-        design and APIs to the interface.
+        {t.about.lead}
       </p>
       <dl className="mt-4 space-y-2.5">
-        {FACTS.map((fact) => (
+        {facts.map((fact) => (
           <div key={fact.label} className="min-w-0">
             <dt className="font-mono text-[10px] uppercase tracking-[0.16em] text-chrome-dim">
               {fact.label}
@@ -41,9 +37,9 @@ export default function TerminalSummary() {
         ))}
       </dl>
       <p className="mt-4 font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-chrome-dim">
-        Core stack
+        {t.about.stack}
       </p>
-      <ul className="mt-2 flex flex-wrap gap-1.5">
+      <ul dir="ltr" className="mt-2 flex flex-wrap gap-1.5 rtl:justify-end">
         {STACK.map((chip) => (
           <li
             key={chip}

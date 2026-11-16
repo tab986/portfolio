@@ -178,17 +178,18 @@ export default function PortfolioTerminal() {
       ref={sectionRef}
       id="terminal"
       aria-label="Portfolio terminal"
-      className="relative z-10 flex min-h-svh w-full max-w-[100vw] items-start justify-center overflow-x-hidden px-4 py-8 sm:px-8 sm:py-10 lg:items-center lg:px-8 xl:px-12"
+      className="relative z-10 flex w-full max-w-[100vw] scroll-mt-14 items-start lg:min-h-svh justify-center overflow-x-hidden px-4 py-8 sm:px-8 sm:py-10 lg:items-center lg:px-8 xl:px-12"
       style={{
         paddingBottom: "max(2rem, env(safe-area-inset-bottom))",
-        paddingTop: "max(2rem, env(safe-area-inset-top))",
+        paddingTop: "max(4.5rem, env(safe-area-inset-top))",
       }}
     >
       <div className="grid w-full min-w-0 max-w-[90rem] grid-cols-1 items-start gap-5 lg:grid-cols-12 lg:items-center lg:gap-8">
         <div className="min-w-0 lg:col-span-4">
           <TerminalSummary />
         </div>
-        <div className="min-w-0 lg:col-span-8">
+        {/* A shell reads left to right in any language. */}
+        <div dir="ltr" className="min-w-0 lg:col-span-8">
           <div className="overflow-hidden rounded-lg border border-[var(--surface-border)] bg-[#0d0d0d] shadow-[0_0_0_1px_rgba(212,175,55,0.08),0_24px_80px_rgba(0,0,0,0.55)]">
             <div className="flex flex-wrap items-center gap-2 border-b border-[var(--surface-border)] bg-[#161616] px-3 py-2 sm:gap-3 sm:px-4 sm:py-2.5">
               <div className="flex shrink-0 gap-1.5" aria-hidden>
@@ -253,7 +254,7 @@ export default function PortfolioTerminal() {
             <div
               ref={scrollerRef}
               data-terminal-scroll
-              className="h-[min(48svh,26rem)] overflow-x-auto overflow-y-auto overscroll-contain px-3 py-3 font-mono text-xs leading-relaxed sm:h-[min(56svh,32rem)] sm:px-5 sm:py-4 sm:text-[13px]"
+              className="h-[min(48svh,26rem)] overflow-x-auto overflow-y-auto px-3 py-3 font-mono text-xs leading-relaxed sm:h-[min(56svh,32rem)] sm:px-5 sm:py-4 sm:text-[13px]"
               role="log"
               aria-live="polite"
               aria-relevant="additions"
@@ -297,10 +298,6 @@ export default function PortfolioTerminal() {
               ) : null}
             </div>
           </div>
-
-          <p className="mt-4 px-2 text-center font-sans text-[10px] font-medium uppercase tracking-[0.18em] text-chrome-dim sm:tracking-[0.22em]">
-            Scroll for projects
-          </p>
         </div>
       </div>
     </section>

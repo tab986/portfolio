@@ -18,3 +18,5 @@ export const TELEGRAM_HANDLE = "@o_xdv";
 export const TELEGRAM_HREF = "https://t.me/o_xdv";
 export const LINKEDIN_LABEL = "linkedin.com/in/abdalrhmn-anwar-764679279";
 export const LINKEDIN_HREF = "https://linkedin.com/in/abdalrhmn-anwar-764679279";
+export const GITHUB_LABEL = "github.com/tab986";
+export const GITHUB_HREF = "https://github.com/tab986";
