@@ -1,13 +1,56 @@
 "use client";
 
-import { Languages } from "lucide-react";
-import { setLang, useLang } from "@/lib/i18n";
+import { setLang, useLang, type Lang } from "@/lib/i18n";
 
 const linkClassName =
   "tap-target inline-flex min-h-11 cursor-pointer items-center rounded-sm px-1 font-sans text-xs font-medium text-chrome transition-colors duration-200 hover:text-gold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold sm:px-2 sm:text-[13px]";
 
-export default function SiteNav() {
+const LANGUAGES: { code: Lang; label: string; name: string }[] = [
+  { code: "en", label: "EN", name: "English" },
+  { code: "ar", label: "عربي", name: "العربية" },
+];
+
+/**
+ * Both languages are always visible and the active one is filled, so the
+ * control reads as a state, not as a single button that changes its own label.
+ */
+function LanguageSwitch() {
   const { lang, t } = useLang();
+
+  return (
+    <div
+      role="group"
+      aria-label={t.nav.language}
+      className="flex shrink-0 items-center rounded-full border border-[var(--surface-border)] bg-black/30 p-0.5"
+    >
+      {LANGUAGES.map((option) => {
+        const active = option.code === lang;
+        return (
+          <button
+            key={option.code}
+            type="button"
+            lang={option.code}
+            dir={option.code === "ar" ? "rtl" : "ltr"}
+            onClick={() => setLang(option.code)}
+            aria-pressed={active}
+            aria-label={option.name}
+            className={`tap-target inline-flex h-8 w-11 cursor-pointer items-center justify-center rounded-full text-xs font-semibold transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold ${
+              option.code === "ar" ? "font-arabic" : ""
+            } ${
+              active ? "bg-gold text-obsidian" : "text-chrome hover:text-warm-white"
+            }`}
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** The bar keeps one layout in both languages; only its labels are translated. */
+export default function SiteNav() {
+  const { t } = useLang();
 
   const links = [
     { href: "#portfolio", label: t.nav.projects },
@@ -47,15 +90,7 @@ export default function SiteNav() {
             ))}
           </ul>
 
-          <button
-            type="button"
-            onClick={() => setLang(lang === "ar" ? "en" : "ar")}
-            aria-label={t.nav.switchLabel}
-            className="tap-target inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-md border border-gold/45 px-2.5 py-1.5 font-sans text-xs font-medium text-gold transition-colors duration-200 hover:border-gold hover:bg-gold/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
-          >
-            <Languages aria-hidden className="h-3.5 w-3.5" />
-            <span lang={lang === "ar" ? "en" : "ar"}>{t.nav.switchTo}</span>
-          </button>
+          <LanguageSwitch />
         </div>
       </nav>
     </header>

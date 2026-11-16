@@ -67,7 +67,7 @@
   --color-chrome-dim: var(--chrome-dim);
   --font-sans: var(--font-plus-jakarta), var(--font-arabic);
   --font-serif: var(--font-plus-jakarta), var(--font-arabic);
-  --font-mono: var(--font-jetbrains-mono);
+  --font-mono: var(--font-jetbrains-mono), var(--font-arabic);
   --font-heading: var(--font-plus-jakarta), var(--font-arabic);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -132,22 +132,36 @@ body {
   text-size-adjust: 100%;
 }
 
-/* Arabic letters must stay joined: no tracking outside left-to-right islands. */
+/*
+ * Arabic letters must stay joined: no tracking outside left-to-right islands.
+ * The page itself has no `dir`; only text blocks carry one.
+ */
 html[lang="ar"] *:not([dir="ltr"]):not([dir="ltr"] *) {
   letter-spacing: 0 !important;
 }
 
 /*
- * The Arabic face has to come first: the Latin font's metric fallback is a
- * local Arial alias, which has Arabic glyphs and would win otherwise.
+ * Arabic text needs the Arabic face first: the Latin fonts' metric fallback is
+ * a local Arial alias with Arabic glyphs, which would otherwise win.
+ * Left-to-right islands (project names, tags, links, the terminal) keep the
+ * Latin fonts, so they look identical in both languages.
  */
 html[lang="ar"] body,
-html[lang="ar"] .font-sans {
+html[lang="ar"] .font-sans:not([dir="ltr"]):not([dir="ltr"] *) {
   font-family: var(--font-arabic), var(--font-plus-jakarta), system-ui, sans-serif;
 }
 
 html[lang="ar"] .font-mono:not([dir="ltr"]):not([dir="ltr"] *) {
   font-family: var(--font-arabic), var(--font-jetbrains-mono), monospace;
+}
+
+html[lang="ar"] [dir="ltr"]:not(.font-mono) {
+  font-family: var(--font-plus-jakarta), var(--font-arabic), system-ui, sans-serif;
+}
+
+/* A label that is Arabic in either language (the language switch). */
+html .font-arabic {
+  font-family: var(--font-arabic), system-ui, sans-serif;
 }
 
 img,

@@ -20,7 +20,7 @@ const SplitText = dynamic(() => import("@/components/SplitText"), {
 
 export default function WelcomeIntro() {
   const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
-  const { t, isArabic } = useLang();
+  const { t, isArabic, dir } = useLang();
   // Splitting into characters breaks Arabic letter joining, so Arabic is set plain.
   const animateName = !reduceMotion && !isArabic;
 
@@ -37,7 +37,7 @@ export default function WelcomeIntro() {
 
       <div className="relative mx-auto grid h-full w-full max-w-[90rem] flex-1 grid-cols-1 content-start items-stretch gap-2 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-[calc(4.75rem+env(safe-area-inset-top))] sm:gap-4 sm:px-8 lg:grid-cols-12 lg:grid-rows-none lg:content-stretch lg:gap-6 lg:px-8 lg:pb-8 lg:pt-14 xl:gap-8 xl:px-12">
         <div className="relative z-20 flex shrink-0 flex-col justify-center pt-2 lg:col-span-5 lg:pt-0 xl:col-span-4">
-          <div className="max-w-md lg:max-w-none">
+          <div dir={dir} className="max-w-md lg:max-w-none">
             <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-gold sm:text-xs">
               {t.hero.role}
             </p>
@@ -98,7 +98,7 @@ export default function WelcomeIntro() {
             style={{ height: "100%" }}
             className="absolute inset-0 w-full object-contain lg:hidden"
           />
-          <div className="welcome-room-stage absolute inset-0 hidden overflow-hidden bg-transparent shadow-none lg:-end-8 lg:start-0 lg:block xl:-end-12">
+          <div className="welcome-room-stage absolute inset-0 hidden overflow-hidden bg-transparent shadow-none lg:-right-8 lg:left-0 lg:block xl:-right-12">
             <HeroExperienceClient />
           </div>
         </figure>

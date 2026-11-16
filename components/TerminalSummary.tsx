@@ -6,7 +6,7 @@ const STACK = ["Next.js", "Node.js", "Flutter", "PostgreSQL", "Cloudflare Worker
 
 /** Facts taken from the CV. No year-count or project total is stated there. */
 export default function TerminalSummary() {
-  const { t } = useLang();
+  const { t, dir } = useLang();
 
   const facts = [
     { label: t.about.work, value: t.about.workValue },
@@ -16,7 +16,7 @@ export default function TerminalSummary() {
   ];
 
   return (
-    <aside aria-labelledby="about-heading" className="glass-panel min-w-0 rounded-lg p-4 sm:p-5">
+    <aside dir={dir} aria-labelledby="about-heading" className="glass-panel min-w-0 rounded-lg p-4 sm:p-5">
       <h2
         id="about-heading"
         className="font-mono text-[10px] font-medium uppercase tracking-[0.22em] text-gold"

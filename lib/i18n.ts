@@ -15,8 +15,7 @@ const en = {
     projects: "Projects",
     about: "About",
     contact: "Contact",
-    switchTo: "العربية",
-    switchLabel: "عرض الموقع بالعربية",
+    language: "Language",
   },
   hero: {
     role: "Full-Stack Developer · Baghdad, Iraq",
@@ -47,7 +46,7 @@ const en = {
   },
   contact: {
     eyebrow: "Contact",
-    title: "Let's talk.",
+    title: "Get in touch",
     lead: "Have a project or a role in mind? Reach me directly through any of these.",
     email: "Email",
     phone: "Phone",
@@ -71,8 +70,7 @@ const ar: typeof en = {
     projects: "المشاريع",
     about: "نبذة",
     contact: "تواصل",
-    switchTo: "English",
-    switchLabel: "View the site in English",
+    language: "اللغة",
   },
   hero: {
     role: "مطوّر Full-Stack · بغداد، العراق",
@@ -103,7 +101,7 @@ const ar: typeof en = {
   },
   contact: {
     eyebrow: "تواصل",
-    title: "لنتحدث.",
+    title: "للتواصل معي",
     lead: "عندك مشروع أو فرصة عمل؟ تواصل معي مباشرة عبر أي من هذه الوسائل.",
     email: "البريد",
     phone: "الهاتف",
@@ -164,5 +162,15 @@ export function setLang(lang: Lang) {
  */
 export function useLang() {
   const lang = useSyncExternalStore<Lang>(subscribe, readStored, () => "en");
-  return { lang, t: DICTIONARY[lang], isArabic: lang === "ar" };
+  return {
+    lang,
+    t: DICTIONARY[lang],
+    isArabic: lang === "ar",
+    /**
+     * Put this on text blocks. The page itself never flips: columns, the nav
+     * and the 3D scenes stay where they are, and only the text reads
+     * right-to-left inside its own block.
+     */
+    dir: lang === "ar" ? ("rtl" as const) : ("ltr" as const),
+  };
 }

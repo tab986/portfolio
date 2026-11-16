@@ -112,7 +112,7 @@ const linkClassName =
   "tap-target inline-flex min-h-11 items-center gap-1 rounded-sm font-mono text-xs text-react underline-offset-2 hover:text-gold hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold";
 
 function ProjectBody({ project, featured }: { project: Project; featured: boolean }) {
-  const { lang } = useLang();
+  const { lang, dir } = useLang();
 
   return (
     <>
@@ -134,7 +134,7 @@ function ProjectBody({ project, featured }: { project: Project; featured: boolea
         />
       </div>
 
-      <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
+      <div dir={dir} className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
         <p className="font-sans text-[10px] font-medium uppercase tracking-[0.2em] text-chrome">
           {project.role[lang]}
         </p>
@@ -220,14 +220,14 @@ function ProjectEntry({ project, featured }: { project: Project; featured: boole
 }
 
 export default function ProjectCard() {
-  const { t } = useLang();
+  const { t, dir } = useLang();
 
   return (
     <div className="w-full min-w-0">
-      <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-gold sm:text-xs">
+      <p dir={dir} className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-gold sm:text-xs">
         {t.projects.eyebrow}
       </p>
-      <div className="mt-2 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+      <div dir={dir} className="mt-2 flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
         <h2
           id="projects-heading"
           className="font-sans text-[clamp(1.75rem,6vw,2.75rem)] font-semibold leading-tight tracking-tight text-warm-white"

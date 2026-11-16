@@ -9,7 +9,7 @@ import { CV_FILENAME, CV_HREF } from "@/lib/site";
 
 /** Closing section: every way to reach out, with the ID card beside it. */
 export default function ContactSection() {
-  const { t } = useLang();
+  const { t, dir } = useLang();
 
   return (
     <section
@@ -18,7 +18,7 @@ export default function ContactSection() {
       className="relative z-10 mx-auto w-full max-w-[90rem] scroll-mt-14 overflow-x-hidden px-4 pb-10 pt-16 sm:px-8 lg:pb-12 lg:pt-20 xl:px-12"
     >
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:items-center lg:gap-8 xl:gap-10">
-        <div className="min-w-0 lg:col-span-5">
+        <div dir={dir} className="min-w-0 lg:col-span-5">
           <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-gold sm:text-xs">
             {t.contact.eyebrow}
           </p>
@@ -87,8 +87,7 @@ export default function ContactSection() {
         </div>
 
         <div className="hidden w-full min-w-0 flex-col items-center justify-center lg:col-span-7 lg:flex lg:items-end lg:justify-start lg:self-start">
-          {/* The 3D scene is composed left-to-right, so its stage keeps that direction. */}
-          <div dir="ltr" className="w-full lg:max-w-[760px] lg:overflow-visible">
+          <div className="w-full lg:max-w-[760px] lg:overflow-visible">
             <LanyardCardClient />
           </div>
         </div>

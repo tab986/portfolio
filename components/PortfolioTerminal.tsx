@@ -188,7 +188,8 @@ export default function PortfolioTerminal() {
         <div className="min-w-0 lg:col-span-4">
           <TerminalSummary />
         </div>
-        {/* A shell reads left to right in any language. */}
+        {/* A shell reads left to right in any language; this also keeps Arabic's
+            letter-spacing reset off its monospace text. */}
         <div dir="ltr" className="min-w-0 lg:col-span-8">
           <div className="overflow-hidden rounded-lg border border-[var(--surface-border)] bg-[#0d0d0d] shadow-[0_0_0_1px_rgba(212,175,55,0.08),0_24px_80px_rgba(0,0,0,0.55)]">
             <div className="flex flex-wrap items-center gap-2 border-b border-[var(--surface-border)] bg-[#161616] px-3 py-2 sm:gap-3 sm:px-4 sm:py-2.5">
