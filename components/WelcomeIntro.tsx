@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import { FileDown } from "lucide-react";
 import ContactMenu from "@/components/ContactMenu";
 import HeroExperienceClient from "@/components/hero-3d/HeroExperienceClient";
@@ -28,20 +27,20 @@ export default function WelcomeIntro() {
     <section
       id="welcome"
       aria-label={t.hero.name}
-      className="relative z-10 flex w-full max-w-[100vw] flex-col overflow-hidden lg:h-svh lg:min-h-[100dvh]"
+      className="relative z-10 flex w-full max-w-[100vw] flex-col overflow-hidden max-lg:min-h-svh lg:h-svh lg:min-h-[100dvh]"
     >
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_85%_65%_at_72%_42%,rgba(54,54,54,0.55),transparent_68%),radial-gradient(ellipse_55%_45%_at_18%_78%,rgba(212,175,55,0.05),transparent_62%),#1a1a1a]"
       />
 
-      <div className="relative mx-auto grid h-full w-full max-w-[90rem] flex-1 grid-cols-1 content-start items-stretch gap-2 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-[calc(4.75rem+env(safe-area-inset-top))] sm:gap-4 sm:px-8 lg:grid-cols-12 lg:grid-rows-none lg:content-stretch lg:gap-6 lg:px-8 lg:pb-8 lg:pt-14 xl:gap-8 xl:px-12">
+      <div className="relative mx-auto grid h-full w-full max-w-[90rem] flex-1 grid-cols-1 content-center items-stretch gap-2 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-[calc(4.75rem+env(safe-area-inset-top))] sm:gap-4 sm:px-8 lg:grid-cols-12 lg:grid-rows-none lg:content-stretch lg:gap-6 lg:px-8 lg:pb-8 lg:pt-14 xl:gap-8 xl:px-12">
         <div className="relative z-20 flex shrink-0 flex-col justify-center pt-2 lg:col-span-5 lg:pt-0 xl:col-span-4">
           <div dir={dir} className="max-w-md lg:max-w-none">
             <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-gold sm:text-xs">
               {t.hero.role}
             </p>
-            <h1 className={`${headlineClassName} relative mt-3 sm:mt-4`} style={{ textAlign: "start" }}>
+            <h1 className={`${headlineClassName} relative mt-5 sm:mt-4`} style={{ textAlign: "start" }}>
               <span className="sr-only">{t.hero.name}</span>
               {animateName ? (
                 <SplitText
@@ -64,10 +63,10 @@ export default function WelcomeIntro() {
                 <span aria-hidden="true">{t.hero.name}</span>
               )}
             </h1>
-            <p className="mt-4 max-w-md font-sans text-[0.9375rem] leading-relaxed text-chrome sm:mt-6 md:text-base">
+            <p className="mt-6 max-w-md font-sans text-[0.9375rem] leading-relaxed text-chrome sm:mt-6 md:text-base">
               {t.hero.lead}
             </p>
-            <div className="mt-5 flex flex-wrap gap-2 sm:mt-6">
+            <div className="mt-8 flex flex-wrap gap-3 sm:mt-6 sm:gap-2">
               <ContactMenu buttonClassName="px-4 py-2.5" desktopUp />
               <a
                 href={CV_HREF}
@@ -83,22 +82,12 @@ export default function WelcomeIntro() {
           </div>
         </div>
 
+        {/* The room is desktop only. Phones and tablets show no room at all (no image, no WebGL, no model download). */}
         <figure
           aria-label={t.hero.roomAlt}
-          className="relative min-h-0 w-full min-w-0 max-lg:mx-auto max-lg:aspect-[5/4] max-lg:max-w-xl lg:col-span-7 lg:h-auto lg:min-h-0 lg:cursor-grab lg:active:cursor-grabbing xl:col-span-8"
+          className="relative hidden min-h-0 w-full min-w-0 lg:col-span-7 lg:block lg:h-auto lg:min-h-0 lg:cursor-grab lg:active:cursor-grabbing xl:col-span-8"
         >
-          {/* Phones and tablets get a still render: no WebGL, three.js or model download. */}
-          <Image
-            src="/hero-3d/room-static.webp"
-            alt=""
-            width={900}
-            height={724}
-            unoptimized
-            loading="eager"
-            style={{ height: "100%" }}
-            className="absolute inset-0 w-full object-contain lg:hidden"
-          />
-          <div className="welcome-room-stage absolute inset-0 hidden overflow-hidden bg-transparent shadow-none lg:-right-8 lg:left-0 lg:block xl:-right-12">
+          <div className="welcome-room-stage absolute inset-0 overflow-hidden bg-transparent shadow-none lg:-right-8 lg:left-0 xl:-right-12">
             <HeroExperienceClient />
           </div>
         </figure>
