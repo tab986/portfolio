@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown, Mail, Phone, Send, type LucideIcon } from "lucide-react";
+import { useMediaQueryAfterHydration } from "@/components/hero-3d/useMediaQuery";
 import { useLang } from "@/lib/i18n";
 import {
   CONTACT_EMAIL,
@@ -111,13 +113,19 @@ export default function ContactMenu({
   const { t } = useLang();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const panelId = useId();
+  // On phones and tablets the list opens as a bottom sheet in <body>, so the
+  // welcome section's overflow clipping and stacking can never cut it off.
+  const sheet = useMediaQueryAfterHydration("(max-width: 1023px)");
 
   useEffect(() => {
     if (!open) return;
 
     const onPointerDown = (e: PointerEvent) => {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+      const target = e.target as Node;
+      if (rootRef.current?.contains(target) || panelRef.current?.contains(target)) return;
+      setOpen(false);
     };
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -146,15 +154,42 @@ export default function ContactMenu({
         />
       </button>
 
-      <div
-        id={panelId}
-        hidden={!open}
-        className={`absolute start-0 top-full z-40 mt-2 w-[min(21rem,calc(100vw-2rem))] rounded-lg border border-gold/35 bg-[#161616] p-1.5 shadow-[0_24px_60px_rgba(0,0,0,0.65)] ${
-          desktopUp ? "lg:bottom-full lg:top-auto lg:mb-2 lg:mt-0" : ""
-        }`}
-      >
-        <ContactList />
-      </div>
+      {sheet ? (
+        open &&
+        createPortal(
+          <>
+            <div
+              aria-hidden
+              onClick={() => setOpen(false)}
+              className="fixed inset-0 z-[70] bg-black/60 motion-safe:animate-fade-up"
+            />
+            <div
+              ref={panelRef}
+              id={panelId}
+              role="dialog"
+              aria-label={t.contact.details}
+              className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-[71] max-h-[85svh] overflow-y-auto rounded-2xl border border-gold/35 bg-[#161616] p-2 shadow-[0_-16px_60px_rgba(0,0,0,0.7)] motion-safe:animate-fade-up"
+            >
+              <p className="px-3 pb-1 pt-2 font-sans text-[11px] font-medium uppercase tracking-[0.2em] text-gold">
+                {t.contact.details}
+              </p>
+              <ContactList />
+            </div>
+          </>,
+          document.body,
+        )
+      ) : (
+        <div
+          ref={panelRef}
+          id={panelId}
+          hidden={!open}
+          className={`absolute start-0 z-40 w-[21rem] rounded-lg border border-gold/35 bg-[#161616] p-1.5 shadow-[0_24px_60px_rgba(0,0,0,0.65)] ${
+            desktopUp ? "bottom-full mb-2" : "top-full mt-2"
+          }`}
+        >
+          <ContactList />
+        </div>
+      )}
     </div>
   );
 }

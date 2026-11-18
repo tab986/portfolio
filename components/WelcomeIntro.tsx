@@ -34,13 +34,13 @@ export default function WelcomeIntro() {
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_85%_65%_at_72%_42%,rgba(54,54,54,0.55),transparent_68%),radial-gradient(ellipse_55%_45%_at_18%_78%,rgba(212,175,55,0.05),transparent_62%),#1a1a1a]"
       />
 
-      <div className="relative mx-auto grid h-full w-full max-w-[90rem] flex-1 grid-cols-1 content-center items-stretch gap-2 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-[calc(4.75rem+env(safe-area-inset-top))] sm:gap-4 sm:px-8 lg:grid-cols-12 lg:grid-rows-none lg:content-stretch lg:gap-6 lg:px-8 lg:pb-8 lg:pt-14 xl:gap-8 xl:px-12">
+      <div className="relative mx-auto grid h-full w-full max-w-[90rem] flex-1 grid-cols-1 content-center items-stretch gap-2 px-4 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-[calc(4.75rem+env(safe-area-inset-top))] sm:gap-4 sm:px-8 lg:grid-cols-12 lg:grid-rows-none lg:content-stretch lg:gap-6 lg:px-8 lg:pb-8 lg:pt-14 xl:gap-8 xl:px-12">
         <div className="relative z-20 flex shrink-0 flex-col justify-center pt-2 lg:col-span-5 lg:pt-0 xl:col-span-4">
           <div dir={dir} className="max-w-md lg:max-w-none">
             <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-gold sm:text-xs">
               {t.hero.role}
             </p>
-            <h1 className={`${headlineClassName} relative mt-5 sm:mt-4`} style={{ textAlign: "start" }}>
+            <h1 className={`${headlineClassName} relative mt-2 sm:mt-4`} style={{ textAlign: "start" }}>
               <span className="sr-only">{t.hero.name}</span>
               {animateName ? (
                 <SplitText
@@ -63,10 +63,10 @@ export default function WelcomeIntro() {
                 <span aria-hidden="true">{t.hero.name}</span>
               )}
             </h1>
-            <p className="mt-6 max-w-md font-sans text-[0.9375rem] leading-relaxed text-chrome sm:mt-6 md:text-base">
+            <p className="mt-10 max-w-md font-sans text-[0.9375rem] leading-relaxed text-chrome sm:mt-6 md:text-base">
               {t.hero.lead}
             </p>
-            <div className="mt-8 flex flex-wrap gap-3 sm:mt-6 sm:gap-2">
+            <div className="mt-9 flex flex-wrap gap-3 sm:mt-6 sm:gap-2 [&>*]:basis-36 [&>*]:flex-1 sm:[&>*]:flex-none sm:[&>*]:basis-auto">
               <ContactMenu buttonClassName="px-4 py-2.5" desktopUp />
               <a
                 href={CV_HREF}
